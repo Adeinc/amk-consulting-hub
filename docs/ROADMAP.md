@@ -27,8 +27,11 @@ This roadmap sequences work so the client sees a working, deployable system earl
 - [x] Reusable UI primitives: Button, Input, Select, Card, Modal, Badge, Toast, Tabs
 - [x] Base layout: Header, Footer, responsive nav
 - [ ] Supabase project provisioned (dev + prod), auth configured — blocked on Freda's Supabase account
-- [x] Repository on GitHub (`github.com/Adeinc/amk-consulting-hub`), Netlify linked for
-      continuous deployment — every push to `main` auto-deploys, PRs get preview URLs
+- [x] Repository on GitHub (`github.com/Adeinc/amk-consulting-hub`, public — Netlify's
+      private-repo plan only trusts pushes from its one connected contributor account, which
+      blocked builds pushed from a collaborator; made public to unblock CI rather than upgrade
+      plan), Netlify linked for continuous deployment — every push to `main` auto-deploys,
+      PRs get preview URLs
 - [x] Deployed to Netlify with a live URL (`amk-consulting-hub.netlify.app`)
 
 ## Milestone 2 — Public Site (in progress)
