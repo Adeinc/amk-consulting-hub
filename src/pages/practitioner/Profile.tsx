@@ -1,9 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DashboardShell } from "../../components/layout/DashboardShell";
 import { Card } from "../../components/ui/Card";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import { useToast } from "../../components/ui/Toast";
+import { QrCode } from "../../components/booking/QrCode";
+import { BookingDetailModal } from "../../components/booking/BookingDetailModal";
+import { getMockBookings, bookingReferenceQrValue, type MockBooking } from "../../lib/mockBookings";
+import { sessionLabels } from "../../data/rooms";
 
 const navItems = [
   { to: "/dashboard", label: "My bookings" },
@@ -41,6 +45,12 @@ export function Profile() {
   const [notifyConfirmations, setNotifyConfirmations] = useState(true);
   const [notifyReminders, setNotifyReminders] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [bookings, setBookings] = useState<MockBooking[]>([]);
+  const [viewing, setViewing] = useState<MockBooking | null>(null);
+
+  useEffect(() => {
+    setBookings(getMockBookings());
+  }, []);
 
   function handleSave() {
     setSaving(true);
@@ -94,7 +104,52 @@ export function Profile() {
             detail="A reminder email ahead of each upcoming session."
           />
         </Card>
+
+        <Card className="lg:col-span-2">
+          <p className="font-display text-lg font-bold mb-1">My booking codes</p>
+          <p className="text-sm text-navy/55 mb-4">
+            Your access code and QR for each booking — also emailed to you when a booking or
+            extension is confirmed.
+          </p>
+          {bookings.length === 0 ? (
+            <p className="text-sm text-navy/45 py-6 text-center">
+              No bookings yet — book a room to get your first access code.
+            </p>
+          ) : (
+            <div className="grid sm:grid-cols-2 gap-4">
+              {bookings.map((b) => (
+                <div key={b.id} className="flex items-center gap-4 bg-soft rounded-2xl p-4">
+                  <QrCode value={bookingReferenceQrValue(b)} size={56} />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-navy text-sm truncate">{b.roomName}</p>
+                    <p className="text-xs text-navy/55 mb-1">
+                      {new Date(b.startDate).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
+                      {b.days > 1 ? ` · ${b.days}d` : ""} &middot; {sessionLabels[b.session]}
+                    </p>
+                    <p className="font-mono-tight text-xs font-bold text-teal-deep">{b.code}</p>
+                  </div>
+                  <Button size="sm" variant="secondary" onClick={() => setViewing(b)}>
+                    View
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
       </div>
+
+      {viewing && (
+        <BookingDetailModal
+          booking={viewing}
+          extendable
+          open={!!viewing}
+          onClose={() => setViewing(null)}
+          onExtended={(updated) => {
+            setBookings((prev) => prev.map((b) => (b.id === updated.id ? updated : b)));
+            setViewing(updated);
+          }}
+        />
+      )}
     </DashboardShell>
   );
 }

@@ -1,9 +1,12 @@
+import { useEffect, useState } from "react";
 import { DashboardShell } from "../../components/layout/DashboardShell";
 import { Badge, Stamp } from "../../components/ui/Badge";
 import { Tabs } from "../../components/ui/Tabs";
 import { Button } from "../../components/ui/Button";
+import { BookingDetailModal } from "../../components/booking/BookingDetailModal";
 import { Link } from "react-router-dom";
 import { rooms, sessionLabels } from "../../data/rooms";
+import { getMockBookings, type MockBooking } from "../../lib/mockBookings";
 import type { Room, SessionType, BookingStatus } from "../../types";
 
 const navItems = [
@@ -11,7 +14,7 @@ const navItems = [
   { to: "/dashboard/profile", label: "Profile" },
 ];
 
-interface MockBooking {
+interface IllustrativeBooking {
   id: string;
   room: Room;
   date: string;
@@ -19,39 +22,69 @@ interface MockBooking {
   status: BookingStatus;
 }
 
-/** Mock bookings — pre-backend scaffolding. Real data arrives with Milestone 4 (booking engine). */
-const mockUpcoming: MockBooking[] = [
+/** Illustrative sample rows — always shown alongside anything real you've booked, so the tab never looks empty. */
+const illustrativeUpcoming: IllustrativeBooking[] = [
   { id: "b1", room: rooms[0], date: "2026-07-28", session: "am", status: "confirmed" },
   { id: "b2", room: rooms[3], date: "2026-08-02", session: "full_day", status: "pending" },
 ];
-const mockPast: MockBooking[] = [
+const illustrativePast: IllustrativeBooking[] = [
   { id: "b3", room: rooms[2], date: "2026-07-10", session: "pm", status: "completed" },
 ];
 
-function BookingRow({ booking }: { booking: MockBooking }) {
-  return (
-    <div className="flex items-center justify-between py-4 border-b border-border last:border-0">
-      <div>
-        <p className="font-semibold text-navy">{booking.room.name}</p>
-        <p className="text-sm text-navy/55">
-          {new Date(booking.date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })} &middot;{" "}
-          {sessionLabels[booking.session]}
-        </p>
-      </div>
-      {booking.status === "confirmed" || booking.status === "cancelled" ? (
-        <Stamp kind={booking.status} />
-      ) : (
-        <Badge tone={booking.status === "pending" ? "teal" : "neutral"}>{booking.status}</Badge>
-      )}
-    </div>
-  );
+function toMockShape(b: IllustrativeBooking): MockBooking {
+  const rate = b.session === "am" ? b.room.priceAm : b.session === "pm" ? b.room.pricePm : b.room.priceFullDay;
+  return {
+    id: b.id,
+    code: `AMK-SAMPLE${b.id.slice(-2).toUpperCase()}`,
+    roomId: b.room.id,
+    roomName: b.room.name,
+    startDate: b.date,
+    days: 1,
+    session: b.session,
+    total: rate,
+    createdAt: b.date,
+  };
 }
 
 export function PractitionerDashboard() {
+  const [realBookings, setRealBookings] = useState<MockBooking[]>([]);
+  const [viewing, setViewing] = useState<MockBooking | null>(null);
+
+  useEffect(() => {
+    setRealBookings(getMockBookings());
+  }, []);
+
+  const upcoming: MockBooking[] = [...realBookings, ...illustrativeUpcoming.map(toMockShape)];
+  const past: MockBooking[] = illustrativePast.map(toMockShape);
+
+  function BookingRow({ booking, isReal }: { booking: MockBooking; isReal: boolean }) {
+    return (
+      <div className="flex items-center justify-between py-4 border-b border-border last:border-0 gap-3">
+        <div className="min-w-0">
+          <p className="font-semibold text-navy truncate">{booking.roomName}</p>
+          <p className="text-sm text-navy/55">
+            {new Date(booking.startDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+            {booking.days > 1 ? ` · ${booking.days} days` : ""} &middot; {sessionLabels[booking.session]}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          {isReal ? <Stamp kind="confirmed" /> : <Badge tone="neutral">sample</Badge>}
+          <Button size="sm" variant="secondary" onClick={() => setViewing(booking)}>
+            View code
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <DashboardShell role="Practitioner" navItems={navItems} title="My bookings">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <p className="text-sm text-navy/55">Sample data shown — connects to real bookings at Milestone 4.</p>
+        <p className="text-sm text-navy/55">
+          {realBookings.length > 0
+            ? "Your real bookings appear above the sample rows below."
+            : "Sample data shown — book a room to see it appear here."}
+        </p>
         <Link to="/rooms">
           <Button size="sm">Book another room</Button>
         </Link>
@@ -62,22 +95,36 @@ export function PractitionerDashboard() {
           tabs={[
             {
               id: "upcoming",
-              label: `Upcoming (${mockUpcoming.length})`,
-              content:
-                mockUpcoming.length > 0 ? (
-                  <div>{mockUpcoming.map((b) => <BookingRow key={b.id} booking={b} />)}</div>
-                ) : (
-                  <p className="text-sm text-navy/55 py-8 text-center">No upcoming bookings yet.</p>
-                ),
+              label: `Upcoming (${upcoming.length})`,
+              content: (
+                <div>
+                  {upcoming.map((b) => (
+                    <BookingRow key={b.id} booking={b} isReal={realBookings.some((r) => r.id === b.id)} />
+                  ))}
+                </div>
+              ),
             },
             {
               id: "past",
-              label: `History (${mockPast.length})`,
-              content: <div>{mockPast.map((b) => <BookingRow key={b.id} booking={b} />)}</div>,
+              label: `History (${past.length})`,
+              content: <div>{past.map((b) => <BookingRow key={b.id} booking={b} isReal={false} />)}</div>,
             },
           ]}
         />
       </div>
+
+      {viewing && (
+        <BookingDetailModal
+          booking={viewing}
+          extendable={realBookings.some((r) => r.id === viewing.id)}
+          open={!!viewing}
+          onClose={() => setViewing(null)}
+          onExtended={(updated) => {
+            setRealBookings((prev) => prev.map((b) => (b.id === updated.id ? updated : b)));
+            setViewing(updated);
+          }}
+        />
+      )}
     </DashboardShell>
   );
 }

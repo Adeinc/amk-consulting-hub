@@ -54,6 +54,15 @@ This roadmap sequences work so the client sees a working, deployable system earl
       already designed in `0001_init.sql`
 - [ ] Pending vs confirmed booking states — **auto-confirm on payment is now the locked
       default** (see Section 4 below), not admin-approved
+- [ ] Multi-day bookings (a practitioner books N consecutive days in one go, priced as
+      days × session rate) — the frontend flow, summary, and pricing are prototyped
+      (`BookingFlowModal.tsx`) against mock data; `0001_init.sql`'s `bookings` table models
+      one date per row, so this needs real schema design (a date range vs. one row per day)
+      once the booking engine is actually built
+- [ ] Booking access codes + QR — prototyped end-to-end on mock data (booking confirmation,
+      profile/dashboard display, and an "extend" flow that issues a fresh code). Needs Freda's
+      input on the actual door-access system/vendor before this becomes real — the UI doesn't
+      assume or claim to control any physical hardware
 
 ## Milestone 5 — Payments
 
@@ -98,6 +107,11 @@ This roadmap sequences work so the client sees a working, deployable system earl
 ## Open Items Still Awaiting Freda's Confirmation
 
 Final room names/pricing, which rooms combine, cancellation window, screening questions,
-reception vs admin-only access, practitioner self-registration vs admin-added, door automation
-timing, legal entity name/VAT status, target launch month. See README's "Still Awaiting Client
-Confirmation" section — do not treat any of this as decided.
+reception vs admin-only access, practitioner self-registration vs admin-added, legal entity
+name/VAT status, target launch month. See README's "Still Awaiting Client Confirmation"
+section — do not treat any of this as decided.
+
+**Door access, specifically:** what physical system does AMK actually use (keypad, smart lock,
+intercom, staffed reception only)? Does it have an API/integration path, or is a code only ever
+read by a human at reception? This determines whether "access code + QR" becomes a real
+door-unlock mechanism or stays a reception-facing reference code — a materially different build.

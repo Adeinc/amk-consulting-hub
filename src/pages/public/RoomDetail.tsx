@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { PageShell } from "../../components/layout/PageShell";
 import { Badge, Stamp } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
 import { Reveal } from "../../components/ui/Reveal";
 import { AvailabilityBoard } from "../../components/booking/AvailabilityBoard";
+import { BookingFlowModal } from "../../components/booking/BookingFlowModal";
 import { rooms, sessionLabels } from "../../data/rooms";
 import { roomImagery } from "../../data/imagery";
 
@@ -11,6 +13,7 @@ export function RoomDetail() {
   const { slug } = useParams();
   const room = rooms.find((r) => r.slug === slug);
   const partner = room?.combinesWithRoomId ? rooms.find((r) => r.id === room.combinesWithRoomId) : undefined;
+  const [bookingOpen, setBookingOpen] = useState(false);
 
   if (!room) {
     return (
@@ -86,21 +89,22 @@ export function RoomDetail() {
                   </div>
                 ))}
               </div>
-              <Link to={`/sign-in?next=/rooms/${room.slug}`}>
-                <Button className="w-full" size="lg">
-                  Sign in to book
-                </Button>
-              </Link>
+              <Button className="w-full" size="lg" onClick={() => setBookingOpen(true)}>
+                Book this room
+              </Button>
               <p className="text-xs text-navy/45 text-center mt-3">
                 New here?{" "}
                 <Link to={`/sign-up?next=/rooms/${room.slug}`} className="text-teal-deep font-bold">
                   Create an account
-                </Link>
+                </Link>{" "}
+                to keep a record of your bookings.
               </p>
             </aside>
           </Reveal>
         </div>
       </section>
+
+      <BookingFlowModal room={room} open={bookingOpen} onClose={() => setBookingOpen(false)} />
     </PageShell>
   );
 }
