@@ -100,6 +100,13 @@ cp .env.example .env.local   # fill in Supabase + Stripe keys once provisioned
 npm run dev
 ```
 
+Before committing, make sure git knows who you are for **this repo specifically**
+(`git config user.name` / `user.email`, no `--global` needed) using an identity tied to a
+GitHub account with access here. Netlify's private-repo plan only recognises one contributor
+identity per build — an unconfigured/auto-generated git identity (the kind git falls back to
+from your OS username) will get a build rejected with "unrecognized Git contributor" until
+someone links it under the team's Netlify settings ("Manage Git contributors").
+
 The app runs today with **no backend** — auth, booking, and payment actions are UI-complete
 but not wired to Supabase/Stripe yet (see `src/lib/*.ts` for the exact TODOs and milestone
 each integration lands at).
