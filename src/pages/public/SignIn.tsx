@@ -21,6 +21,9 @@ export function SignIn() {
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <Input label="Email" type="email" name="email" autoComplete="email" required />
         <Input label="Password" type="password" name="password" autoComplete="current-password" required />
+        <Link to="/forgot-password" className="text-sm font-semibold text-teal-deep self-end -mt-2">
+          Forgot password?
+        </Link>
         <Button type="submit" size="lg" disabled={loading} className="mt-2">
           {loading ? "Signing in…" : "Sign in"}
         </Button>

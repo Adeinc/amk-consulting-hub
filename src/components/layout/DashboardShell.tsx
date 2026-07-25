@@ -29,7 +29,11 @@ export function DashboardShell({
             <span className="font-display text-lg font-extrabold">AMK</span>
             <span className="text-xs font-semibold text-teal-bright">Hub</span>
           </Link>
-          <button className="lg:hidden text-white/60 text-xl" onClick={() => setOpen(false)} aria-label="Close menu">
+          <button
+            className="lg:hidden flex items-center justify-center min-w-11 min-h-11 -mr-2 text-white/60 text-xl cursor-pointer"
+            onClick={() => setOpen(false)}
+            aria-label="Close menu"
+          >
             &times;
           </button>
         </div>
@@ -65,7 +69,7 @@ export function DashboardShell({
         <header className="flex items-center justify-between bg-white border-b border-border px-6 py-4">
           <div className="flex items-center gap-3">
             <button
-              className="lg:hidden flex flex-col gap-1.5 p-1 cursor-pointer"
+              className="lg:hidden flex flex-col items-center justify-center gap-1.5 min-w-11 min-h-11 -ml-2 cursor-pointer"
               aria-label="Open menu"
               onClick={() => setOpen(true)}
             >

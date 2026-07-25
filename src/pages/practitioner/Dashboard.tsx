@@ -8,7 +8,7 @@ import type { Room, SessionType, BookingStatus } from "../../types";
 
 const navItems = [
   { to: "/dashboard", label: "My bookings" },
-  { to: "/dashboard", label: "Profile" },
+  { to: "/dashboard/profile", label: "Profile" },
 ];
 
 interface MockBooking {
@@ -72,7 +72,7 @@ export function PractitionerDashboard() {
             },
             {
               id: "past",
-              label: `Past (${mockPast.length})`,
+              label: `History (${mockPast.length})`,
               content: <div>{mockPast.map((b) => <BookingRow key={b.id} booking={b} />)}</div>,
             },
           ]}

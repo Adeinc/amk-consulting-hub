@@ -172,7 +172,7 @@ export function Home() {
                 to={`/rooms/${room.slug}`}
                 className="shrink-0 flex items-center gap-2.5 bg-soft hover:bg-teal/10 rounded-full pl-1.5 pr-4 py-1.5 transition-colors"
               >
-                <img src={roomImagery[room.id]} alt="" className="w-9 h-9 rounded-full object-cover" />
+                <img src={roomImagery[room.id]} alt="" loading="lazy" className="w-9 h-9 rounded-full object-cover" />
                 <span className="text-sm font-bold text-navy whitespace-nowrap">{room.name}</span>
                 <span className="text-xs font-semibold text-teal-deep whitespace-nowrap">from &pound;{room.priceAm}</span>
               </Link>

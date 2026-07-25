@@ -43,7 +43,7 @@ export function Header() {
         </nav>
 
         <button
-          className="md:hidden flex flex-col gap-1.5 p-2 cursor-pointer"
+          className="md:hidden flex flex-col items-center justify-center gap-1.5 min-w-11 min-h-11 cursor-pointer"
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
