@@ -20,15 +20,16 @@ This roadmap sequences work so the client sees a working, deployable system earl
 
 - [x] Vite + React + TypeScript project initialised
 - [x] Tailwind config with AMK Consulting Hub design tokens (brand palette, spacing) carried
-      over from the approved prototype. Typography upgraded from the prototype's Fraunces +
-      Inter to **Frank Ruhl Libre + Hanken Grotesk** — a deliberate choice to move off the
-      most common AI-generated-UI font pairing and give the brand a more distinctive voice;
-      confirmed with the client contact directing this build.
+      over from the approved prototype. Typography is **Public Sans + JetBrains Mono**
+      (revised from an earlier Fraunces + Inter pass, then a brief Frank Ruhl Libre + Hanken
+      Grotesk pass) — Public Sans for display/body, JetBrains Mono reserved strictly for
+      numeric data in the admin dashboard. See `DESIGN.md` for the full rationale.
 - [x] Reusable UI primitives: Button, Input, Select, Card, Modal, Badge, Toast, Tabs
 - [x] Base layout: Header, Footer, responsive nav
 - [ ] Supabase project provisioned (dev + prod), auth configured — blocked on Freda's Supabase account
-- [ ] CI: Netlify preview deploys wired to GitHub PRs
-- [ ] Deployed to Netlify with a live URL
+- [x] Repository on GitHub (`github.com/Adeinc/amk-consulting-hub`), Netlify linked for
+      continuous deployment — every push to `main` auto-deploys, PRs get preview URLs
+- [x] Deployed to Netlify with a live URL (`amk-consulting-hub.netlify.app`)
 
 ## Milestone 2 — Public Site (in progress)
 
