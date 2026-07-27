@@ -36,8 +36,10 @@ This is also the reference implementation for Monedela's reusable room-booking p
 ## Capabilities and Constraints
 
 - Exactly six rooms, each independently priced per session type; two of the six (Clinical Suite A & B) can combine. One room is a dedicated **Dental Treatment Room** (confirmed by the client) — dental chair, overhead light, sterilisation area.
+- The combined Clinical Suite A + B space is **not clinical-use-only** (client-confirmed): it's positioned as a flexible multipurpose event space, suitable for meetings, training days, and conference-style events, in addition to bigger clinical sessions.
 - Final room names, descriptions, and photos are **not yet client-confirmed** — current room content in `src/data/rooms.ts` is explicitly placeholder (`isPlaceholder: true`) and must keep reading as a sample, not a finished lineup, wherever it renders. Room photography is currently stock (free-license Unsplash, see `src/data/imagery.ts`), standing in for real photography.
-- Final pricing is not confirmed; current figures sit inside suggested market-benchmark bands only (£70–£110 AM/PM, £140–£210 full day).
+- Final pricing is not confirmed — the client has said it still needs market analysis; current figures sit inside suggested market-benchmark bands only (£70–£110 AM/PM, £140–£210 full day). Keep pricing clearly provisional wherever it renders.
+- Location facts, client-confirmed: semi-rural setting, ~25 minutes from Manchester city centre by road, under 10 minutes from Manchester Airport, ample on-site parking.
 - No known physical-accessibility facts yet (step-free access, hearing loop, etc.) — do not assert any. Digital accessibility target is WCAG AA (contrast, keyboard nav, labelled inputs) per the functional spec.
 - Backend (Supabase/Stripe/Resend) is stubbed, not wired — this phase of work is the public-facing visual/UX layer.
 - Mobile responsiveness down to 375px width is a hard requirement, booking journey especially.

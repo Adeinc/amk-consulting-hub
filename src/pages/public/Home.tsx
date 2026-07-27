@@ -61,9 +61,9 @@ const faqs = [
 ];
 
 const nearbyHighlights = [
-  { icon: "✈️", label: "Manchester Airport", detail: "~7 minutes by road" },
-  { icon: "🛣️", label: "M56 motorway", detail: "~8 minutes by road" },
-  { icon: "🏰", label: "Adlington Hall & Lyme Park", detail: "moments away" },
+  { icon: "🏙️", label: "Manchester city centre", detail: "~25 minutes by road" },
+  { icon: "✈️", label: "Manchester Airport", detail: "Under 10 minutes by road" },
+  { icon: "🅿️", label: "On-site parking", detail: "Ample parking for practitioners and clients" },
 ];
 
 const mapsUrl = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent("1 Brickworks, Adlington, Manchester, SK10 4NL");
@@ -258,10 +258,14 @@ export function Home() {
               <br />
               when you need it to be.
             </h2>
-            <p className="text-white/70 leading-relaxed max-w-md mb-6">
+            <p className="text-white/70 leading-relaxed max-w-md mb-4">
               {combineA.name} and {combineB.name} stand alone for everyday sessions — or combine
               into one larger space when a session calls for it. Room pairing is confirmed directly
               with AMK Consulting Hub.
+            </p>
+            <p className="text-white/70 leading-relaxed max-w-md mb-6">
+              Combined, it becomes a flexible multipurpose event space — well suited to meetings,
+              training days, or conference-style events, not just clinical sessions.
             </p>
             <Link to={`/rooms/${combineA.slug}`}>
               <Button variant="secondary" className="!bg-white !text-navy !border-white hover:!bg-soft">
@@ -297,6 +301,10 @@ export function Home() {
         <Reveal>
           <Badge tone="teal">Where we are</Badge>
           <h2 className="font-display text-3xl font-extrabold mt-5 mb-4 text-balance">Easy to reach, easy to park.</h2>
+          <p className="text-navy/60 leading-relaxed mb-4">
+            Set in a quiet, semi-rural location just outside Manchester — close enough for an
+            easy commute, far enough for a calmer setting to work in.
+          </p>
           <address className="not-italic text-navy/70 leading-relaxed mb-6">
             1 Brickworks, Adlington
             <br />
