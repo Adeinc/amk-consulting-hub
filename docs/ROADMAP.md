@@ -87,7 +87,9 @@ This roadmap sequences work so the client sees a working, deployable system earl
 - [ ] Practitioner credential attestation — **self-declared Yes/No, not a document upload**
       (locked decision; changes the original `documents` table's purpose, see
       `docs/DATABASE_SCHEMA.md`)
-- [ ] Notification system (booking confirmed, cancelled, reminder)
+- [x] Notification system built ahead of accounts existing (booking confirmed, cancelled,
+      reminder) — Edge Functions, on-brand HTML templates, and client call sites are all
+      written; only account setup and two deploy commands are left, see `docs/EMAIL_SETUP.md`
 - [ ] Audit log, full RLS policy review, accessibility and mobile QA pass
 
 ## Milestone 8 — Launch

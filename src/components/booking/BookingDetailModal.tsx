@@ -3,6 +3,7 @@ import { Modal } from "../ui/Modal";
 import { Button } from "../ui/Button";
 import { QrCode } from "./QrCode";
 import { extendMockBooking, bookingReferenceQrValue, type MockBooking } from "../../lib/mockBookings";
+import { sendBookingConfirmationEmail } from "../../lib/resend";
 import { sessionLabels } from "../../data/rooms";
 
 type Mode = "view" | "extend-select" | "extend-pay" | "extend-done";
@@ -52,6 +53,8 @@ export function BookingDetailModal({
       if (updated) {
         setCurrent(updated);
         onExtended?.(updated);
+        // No-ops until Milestone 4 (real bookings table) — see src/lib/resend.ts.
+        void sendBookingConfirmationEmail(updated.id);
       }
       setPaying(false);
       setMode("extend-done");

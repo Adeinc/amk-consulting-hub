@@ -4,6 +4,7 @@ import { Button } from "../ui/Button";
 import { Select } from "../ui/Select";
 import { QrCode } from "./QrCode";
 import { createMockBooking, bookingReferenceQrValue, type MockBooking } from "../../lib/mockBookings";
+import { sendBookingConfirmationEmail } from "../../lib/resend";
 import { sessionLabels } from "../../data/rooms";
 import type { Room, SessionType } from "../../types";
 
@@ -62,6 +63,8 @@ export function BookingFlowModal({ room, open, onClose }: { room: Room; open: bo
       setBooking(created);
       setPaying(false);
       setStep("confirmation");
+      // No-ops until Milestone 4 (real bookings table) — see src/lib/resend.ts.
+      void sendBookingConfirmationEmail(created.id);
     }, 900);
   }
 
