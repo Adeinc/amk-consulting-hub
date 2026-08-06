@@ -1,23 +1,37 @@
 import { PageShell } from "../../components/layout/PageShell";
 import { RoomCard } from "../../components/booking/RoomCard";
-import { Stamp } from "../../components/ui/Badge";
+import { Badge, Stamp } from "../../components/ui/Badge";
 import { Reveal } from "../../components/ui/Reveal";
 import { rooms } from "../../data/rooms";
-import { brandImagery } from "../../data/imagery";
+import { brandImagery, roomVideos } from "../../data/imagery";
 
 export function RoomsList() {
   return (
     <PageShell>
       <section className="relative overflow-hidden">
-        <div
-          className="ken-burns absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${brandImagery.reception})` }}
-          aria-hidden="true"
-        />
+        {roomVideos.allRoomsHeader ? (
+          <video
+            className="absolute inset-0 w-full h-full object-cover"
+            src={roomVideos.allRoomsHeader}
+            autoPlay
+            muted
+            loop
+            playsInline
+          />
+        ) : (
+          <div
+            className="ken-burns absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url(${brandImagery.reception})` }}
+            aria-hidden="true"
+          />
+        )}
         <div className="absolute inset-0 gradient-hero-overlay" aria-hidden="true" />
 
         <Reveal className="relative max-w-6xl mx-auto px-6 lg:px-10 py-16 lg:py-24">
-          <Stamp kind="sample" className="mb-4" />
+          <div className="flex flex-wrap gap-2 mb-4">
+            <Stamp kind="sample" />
+            <Badge tone="navy">CQC Registered</Badge>
+          </div>
           <h1 className="font-display text-4xl lg:text-5xl font-extrabold mt-1 mb-4 text-white">All rooms</h1>
           <p className="text-white/75 max-w-xl">
             Six independently priced rooms, including a fully equipped dental treatment room.

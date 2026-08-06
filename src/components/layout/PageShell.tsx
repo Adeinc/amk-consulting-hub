@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { FloatingBookButton } from "../ui/FloatingBookButton";
+import { SessionReminderPopup } from "../booking/SessionReminderPopup";
 
 export function PageShell({ children }: { children: ReactNode }) {
   return (
@@ -10,6 +11,7 @@ export function PageShell({ children }: { children: ReactNode }) {
       <main className="flex-1">{children}</main>
       <Footer />
       <FloatingBookButton />
+      <SessionReminderPopup />
     </div>
   );
 }

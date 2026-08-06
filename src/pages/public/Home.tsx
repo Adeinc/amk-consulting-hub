@@ -29,7 +29,7 @@ const waysToBook = [
   {
     icon: "🤝",
     title: "Combined Space",
-    detail: "Clinical Suite A and Suite B adjoin, so bigger sessions can spread across both at once.",
+    detail: "The Elm and Ash Rooms adjoin, so bigger sessions can spread across both at once.",
   },
 ];
 
@@ -56,7 +56,7 @@ const faqs = [
   },
   {
     question: "Can I book two rooms as one larger space?",
-    answer: "Clinical Suite A and Clinical Suite B adjoin and can combine for bigger sessions — get in touch to arrange pairing.",
+    answer: "The Elm and Ash Rooms adjoin and can combine for bigger sessions — get in touch to arrange pairing.",
   },
 ];
 
@@ -126,7 +126,10 @@ export function Home() {
 
           <div className="relative z-10 -mt-16 sm:-mt-20 flex flex-col lg:flex-row lg:items-end gap-6 px-2 sm:px-0">
             <Reveal className="bg-white rounded-[28px] shadow-[var(--shadow-lift)] p-7 sm:p-10 max-w-lg">
-              <Badge tone="teal">Manchester &middot; Clinical &amp; Therapy Rooms</Badge>
+              <div className="flex flex-wrap gap-2 mb-4">
+                <Badge tone="teal">Manchester &middot; Clinical &amp; Therapy Rooms</Badge>
+                <Badge tone="navy">CQC Registered</Badge>
+              </div>
               <h1 className="font-display text-[2rem] sm:text-[2.5rem] leading-[1.08] font-extrabold text-balance text-navy mt-4 mb-4">
                 Your Room. Your Hours. Your Practice.
               </h1>
@@ -146,6 +149,7 @@ export function Home() {
                 </Link>
               </div>
               <div className="flex flex-wrap gap-x-5 gap-y-1.5 text-xs font-semibold text-navy/45">
+                <span>&#127973; CQC registered private medical clinic rooms</span>
                 <span>&#128274; Cards never stored</span>
                 <span>&#9889; Confirmed instantly</span>
                 <span>&#128197; AM / PM / full day</span>

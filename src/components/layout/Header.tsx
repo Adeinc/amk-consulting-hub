@@ -14,7 +14,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-border/70">
       <div className="hidden sm:flex justify-between items-center px-6 lg:px-10 py-2 text-xs font-medium text-navy/55">
-        <span>AM, PM &amp; full-day rooms in Manchester</span>
+        <span>CQC Registered &middot; AM, PM &amp; full-day rooms in Manchester</span>
         <span>Booking confirms the moment payment clears</span>
       </div>
 

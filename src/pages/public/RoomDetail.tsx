@@ -6,8 +6,8 @@ import { Button } from "../../components/ui/Button";
 import { Reveal } from "../../components/ui/Reveal";
 import { AvailabilityBoard } from "../../components/booking/AvailabilityBoard";
 import { BookingFlowModal } from "../../components/booking/BookingFlowModal";
-import { rooms, sessionLabels } from "../../data/rooms";
-import { roomImagery } from "../../data/imagery";
+import { rooms, sessionLabels, professionalTips } from "../../data/rooms";
+import { roomImagery, roomVideos } from "../../data/imagery";
 
 export function RoomDetail() {
   const { slug } = useParams();
@@ -44,7 +44,18 @@ export function RoomDetail() {
         <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-16 mt-6">
           <Reveal>
             <div className="relative rounded-[24px] h-64 sm:h-96 mb-8 overflow-hidden shadow-[var(--shadow-card)]">
-              <img src={roomImagery[room.id]} alt="" className="absolute inset-0 w-full h-full object-cover" />
+              {roomVideos.perRoom[room.id] ? (
+                <video
+                  className="absolute inset-0 w-full h-full object-cover"
+                  src={roomVideos.perRoom[room.id]}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                />
+              ) : (
+                <img src={roomImagery[room.id]} alt="" className="absolute inset-0 w-full h-full object-cover" />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-navy/60 via-transparent to-transparent" />
               <span className="absolute top-4 right-4">
                 <Stamp kind="sample" />
@@ -74,6 +85,18 @@ export function RoomDetail() {
                 </p>
               </div>
             )}
+
+            <h2 className="text-sm font-bold text-navy/50 mb-3">Tips for professionals</h2>
+            <ul className="flex flex-col gap-2 mb-8">
+              {professionalTips.map((tip) => (
+                <li key={tip} className="flex items-start gap-2.5 text-sm text-navy/65 leading-relaxed">
+                  <span className="text-teal-deep mt-0.5" aria-hidden="true">
+                    &bull;
+                  </span>
+                  {tip}
+                </li>
+              ))}
+            </ul>
 
             <AvailabilityBoard />
           </Reveal>

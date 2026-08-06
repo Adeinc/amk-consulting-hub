@@ -20,8 +20,8 @@ A booking platform for AMK Consulting Hub, a six-room clinical space business in
 
 Instant, no-hassle booking is the core mechanism: real-time availability plus auto-confirm-on-payment removes the "submit and wait" friction that generic room-booking tools (Skedda, Mindbody) and informal arrangements (a phone call, a Facebook post) both have. That's paired with two supporting claims the design should carry:
 
-- **Room quality & trust** — these are purpose-fitted clinical rooms in a specific, known Manchester location, not a spare office being sublet. The site should read as professional and reassuring, appropriate for healthcare-adjacent use.
-- **Flexibility** — AM/PM/full-day session granularity, plus two rooms (Clinical Suite A & B) that combine into a larger space, fit awkward or larger-scale schedules that rigid single-slot competitors don't.
+- **Room quality & trust** — these are purpose-fitted clinical rooms in a specific, known Manchester location, not a spare office being sublet. The site should read as professional and reassuring, appropriate for healthcare-adjacent use. The business is **CQC registered** (client-confirmed) — a significant, real regulatory credential that should be surfaced prominently as a trust signal, not buried.
+- **Flexibility** — AM/PM/full-day session granularity, plus two rooms (Elm & Ash) that combine into a larger space, fit awkward or larger-scale schedules that rigid single-slot competitors don't.
 
 This is also the reference implementation for Monedela's reusable room-booking platform pattern — generic booking/calendar/admin logic is built to be re-skinned for future clients without a rewrite; AMK-specific branding and the six-room model stay isolated and swappable. This affects code structure, not the visual brief.
 
@@ -35,9 +35,11 @@ This is also the reference implementation for Monedela's reusable room-booking p
 
 ## Capabilities and Constraints
 
-- Exactly six rooms, each independently priced per session type; two of the six (Clinical Suite A & B) can combine. One room is a dedicated **Dental Treatment Room** (confirmed by the client) — dental chair, overhead light, sterilisation area.
-- The combined Clinical Suite A + B space is **not clinical-use-only** (client-confirmed): it's positioned as a flexible multipurpose event space, suitable for meetings, training days, and conference-style events, in addition to bigger clinical sessions.
-- Final room names, descriptions, and photos are **not yet client-confirmed** — current room content in `src/data/rooms.ts` is explicitly placeholder (`isPlaceholder: true`) and must keep reading as a sample, not a finished lineup, wherever it renders. Room photography is currently stock (free-license Unsplash, see `src/data/imagery.ts`), standing in for real photography.
+- The business is **CQC registered** as a private medical clinic (client-confirmed, 06 Aug 2026) — "CQC Registered Private Medical Clinic Rooms" should appear on the site as a trust signal.
+- Exactly six rooms, each independently priced per session type; two of the six (Elm & Ash) can combine. One room is a dedicated dental treatment room (the Rowan Room) — dental chair, overhead light, sterilisation area.
+- Room **names are client-confirmed** (06 Aug 2026): tree names — Oak, Willow, Birch, Elm, Ash, Rowan (`src/data/rooms.ts`). Descriptions, pricing, and photos remain placeholder — see below.
+- The combined Elm + Ash space is **not clinical-use-only** (client-confirmed): it's positioned as a flexible multipurpose event space, suitable for meetings, training days, and conference-style events, in addition to bigger clinical sessions.
+- Final room descriptions and photos are **not yet client-confirmed** — current room content in `src/data/rooms.ts` (other than names) is explicitly placeholder (`isPlaceholder: true`) and must keep reading as a sample, not a finished lineup, wherever it renders. Room photography is currently stock (free-license Unsplash, see `src/data/imagery.ts`), standing in for real photography — real room videos are planned (client is sourcing a videographer) but not yet available; don't fabricate placeholder video content.
 - Final pricing is not confirmed — the client has said it still needs market analysis; current figures sit inside suggested market-benchmark bands only (£70–£110 AM/PM, £140–£210 full day). Keep pricing clearly provisional wherever it renders.
 - Location facts, client-confirmed: semi-rural setting, ~25 minutes from Manchester city centre by road, under 10 minutes from Manchester Airport, ample on-site parking.
 - No known physical-accessibility facts yet (step-free access, hearing loop, etc.) — do not assert any. Digital accessibility target is WCAG AA (contrast, keyboard nav, labelled inputs) per the functional spec.

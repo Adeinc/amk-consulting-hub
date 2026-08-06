@@ -16,7 +16,7 @@ export function BookingPreview() {
   return (
     <div className="relative bg-white/95 backdrop-blur-xl border border-white/40 rounded-[24px] shadow-[var(--shadow-lift)] p-6 w-full max-w-sm">
       <p className="text-xs font-bold uppercase tracking-wide text-navy/45 mb-1">
-        Today &middot; Consulting Room One
+        Today &middot; Oak Room
       </p>
       <p className="font-display text-lg font-extrabold text-navy mb-4">Pick a session</p>
 

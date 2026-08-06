@@ -8,7 +8,7 @@ export function Footer() {
         <div>
           <Logo amkClassName="h-8" subtitleClassName="h-3.5" gap="gap-1 mb-3" />
           <p className="text-sm text-white/60 leading-relaxed">
-            Clinical and therapy room rental. Manchester.
+            CQC registered private medical clinic rooms. Manchester.
           </p>
         </div>
 

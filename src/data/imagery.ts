@@ -22,3 +22,22 @@ export const roomImagery: Record<string, string> = {
   "room-5": "https://images.unsplash.com/photo-1704455306251-b4634215d98f?w=1600&q=80&auto=format&fit=crop",
   "room-6": "https://images.unsplash.com/photo-1728342057953-94bfad8f0e7e?w=1600&q=80&auto=format&fit=crop",
 };
+
+/**
+ * Real location/room video URLs — pending. Freda is sourcing a videographer; nothing here
+ * should be fabricated in the meantime. Both the "All rooms" header and each room's detail
+ * page are built to use a video the moment a URL is added here, falling back to the current
+ * stock photo until then. Fill in and the fallback disappears automatically — no other code
+ * changes needed.
+ */
+export const roomVideos: { allRoomsHeader?: string; perRoom: Record<string, string | undefined> } = {
+  allRoomsHeader: undefined,
+  perRoom: {
+    "room-1": undefined,
+    "room-2": undefined,
+    "room-3": undefined,
+    "room-4": undefined,
+    "room-5": undefined,
+    "room-6": undefined,
+  },
+};
