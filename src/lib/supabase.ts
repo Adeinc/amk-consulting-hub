@@ -10,4 +10,8 @@ if (!url || !anonKey) {
   );
 }
 
-export const supabase = createClient(url ?? "", anonKey ?? "");
+// createClient throws synchronously on an empty-string key (even paired with a real URL),
+// which would crash the whole app at module load — not just the Supabase call site. Fall back
+// to a syntactically valid placeholder so construction always succeeds; real calls still fail
+// gracefully (network error) against it until both env vars are actually set.
+export const supabase = createClient(url || "https://placeholder.supabase.co", anonKey || "placeholder-anon-key");
