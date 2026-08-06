@@ -1,10 +1,15 @@
 # Email Setup — What's Built vs. What's Left to Connect
 
-All the email logic is written and ready. Nothing below involves writing code — it's account
-setup, secrets, and two CLI commands. This is deliberate: it lets this work happen now, ahead
-of Freda's Resend/Supabase accounts, so connecting them later is fast.
+## Done (06 Aug 2026)
 
-## Already built
+- **Templates, functions, client call sites** — all built (see below for what each does).
+- **Supabase project provisioned**: `fzxhkljocnxwowlsyhnf` (eu-west-3).
+- **Database migrations applied** — `0001_init.sql`, `0002_add_reminder_tracking.sql`.
+- **Both Edge Functions deployed**: `send-booking-confirmation`, `send-booking-reminder`.
+- **Resend account created**: `info@amkconsultinghub.co.uk`.
+- **Frontend wired**: `.env.local` has the real `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+
+## What's built
 
 - **Templates** — `supabase/functions/_shared/email-templates.ts`: booking confirmed, booking
   cancelled, session reminder. On-brand (navy/teal), table-based HTML for email client
@@ -13,47 +18,47 @@ of Freda's Resend/Supabase accounts, so connecting them later is fast.
   (or an extension) confirms. Looks up the booking + room + practitioner, sends the email,
   logs it to the `notifications` table.
 - **`send-booking-reminder`** — Edge Function, designed to run on a schedule. Finds tomorrow's
-  confirmed bookings that haven't had a reminder yet, sends one, marks it sent (`bookings.reminder_sent_at`,
-  added in `0002_add_reminder_tracking.sql`) so it never double-sends.
+  confirmed bookings that haven't had a reminder yet, sends one, marks it sent (`bookings.reminder_sent_at`)
+  so it never double-sends.
 - **Client-side call sites** — `BookingFlowModal` and `BookingDetailModal` already call
-  `sendBookingConfirmationEmail(bookingId)` (`src/lib/resend.ts`) at the right moments. Right
-  now this just logs a warning and does nothing, because there's no real Supabase project or
-  deployed function yet to answer the call — that's expected, not a bug.
+  `sendBookingConfirmationEmail(bookingId)` (`src/lib/resend.ts`) at the right moments. These
+  will start actually sending mail the moment the secrets below are set — no code change needed.
 
-## What's actually left (once Freda's accounts exist)
+## The one thing still outstanding: secrets
 
-**1. Resend account + domain**
-- Create a Resend account, add `amkconsultinghub.co.uk` as a sending domain
-- Add the DNS records Resend gives you (domain verification + DKIM) to the domain's DNS
-- Once verified, generate a Resend API key
+The CLI token in use doesn't have Supabase's secrets-management privilege (a role/permission
+thing, not a setup mistake) — someone with sufficient access needs to add three secrets via the
+dashboard:
 
-**2. Supabase secrets** (once the Supabase project itself is provisioned — separate item, not email-specific)
-```bash
-supabase secrets set RESEND_API_KEY=re_xxxxxxxx
-supabase secrets set FROM_EMAIL="AMK Consulting Hub <bookings@amkconsultinghub.co.uk>"
-supabase secrets set SITE_URL=https://amkconsultinghub.co.uk
-```
+**[supabase.com/dashboard/project/fzxhkljocnxwowlsyhnf/settings/functions](https://supabase.com/dashboard/project/fzxhkljocnxwowlsyhnf/settings/functions)**
+→ Secrets → add:
 
-**3. Deploy the functions**
-```bash
-supabase functions deploy send-booking-confirmation
-supabase functions deploy send-booking-reminder --no-verify-jwt
-```
+| Key | Value |
+|---|---|
+| `RESEND_API_KEY` | (the Resend key, generated 06 Aug 2026) |
+| `FROM_EMAIL` | `AMK Consulting Hub <info@amkconsultinghub.co.uk>` |
+| `SITE_URL` | `https://amk-consulting-hub.netlify.app` (or the custom domain, once live there) |
 
-**4. Schedule the reminder function** — in the Supabase Dashboard under Edge Functions → your
+Once those three are set, booking confirmations start sending for real on the next booking made
+through the site.
+
+## Still to do after that
+
+**1. Schedule the reminder function** — in the Supabase Dashboard under Edge Functions → your
 function → Cron, set it to run hourly (`0 * * * *`). Alternatively, a `pg_cron` job calling
 `net.http_post` against the function's URL works too if you'd rather manage it in SQL.
 
-**5. Point `LOGO_URL` at the real domain** — `supabase/functions/_shared/email-templates.ts`
+**2. Resend domain verification** — add `amkconsultinghub.co.uk` as a sending domain in Resend
+and add the DNS records it gives you (domain verification + DKIM), so mail sends from
+`info@amkconsultinghub.co.uk` instead of a shared/default address and doesn't land in spam.
+
+**3. Point `LOGO_URL` at the real domain** — `supabase/functions/_shared/email-templates.ts`
 currently references the Netlify URL for the logo image (emails need an absolute, publicly
 reachable image URL). Update it once `amkconsultinghub.co.uk` is the live hosting domain.
 
-**6. Supabase Auth's own emails (sign-up verification, password reset)** — these aren't custom
+**4. Supabase Auth's own emails (sign-up verification, password reset)** — these aren't custom
 Edge Functions; Supabase Auth sends them itself. Two things to do in the Supabase Dashboard
 under Authentication → Emails:
-- Set custom SMTP to Resend's SMTP relay (uses the same API key/domain from step 1)
+- Set custom SMTP to Resend's SMTP relay (uses the same API key/domain from step 2)
 - Optionally restyle the built-in templates to match the brand — not required to function,
   Supabase's defaults work fine as a starting point
-
-Nothing else needs touching in the codebase for any of this — every step above is
-configuration on Resend's and Supabase's own dashboards, or a one-line CLI command.

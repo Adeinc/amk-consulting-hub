@@ -26,7 +26,11 @@ This roadmap sequences work so the client sees a working, deployable system earl
       numeric data in the admin dashboard. See `DESIGN.md` for the full rationale.
 - [x] Reusable UI primitives: Button, Input, Select, Card, Modal, Badge, Toast, Tabs
 - [x] Base layout: Header, Footer, responsive nav
-- [ ] Supabase project provisioned (dev + prod), auth configured — blocked on Freda's Supabase account
+- [x] Supabase project provisioned (`fzxhkljocnxwowlsyhnf`, eu-west-3) — one project so far, not yet
+      split into separate dev/prod projects (see README's environments note); schema migrations
+      applied (`0001_init.sql`, `0002_add_reminder_tracking.sql`); `send-booking-confirmation` and
+      `send-booking-reminder` Edge Functions deployed. Auth not yet wired into the UI (still
+      Milestone 3 work) — the project exists and is reachable, the app doesn't call it yet.
 - [x] Repository on GitHub (`github.com/Adeinc/amk-consulting-hub`, public — Netlify's
       private-repo plan only trusts pushes from its one connected contributor account, which
       blocked builds pushed from a collaborator; made public to unblock CI rather than upgrade
