@@ -10,8 +10,9 @@ import { Button } from "../../components/ui/Button";
 import { Badge } from "../../components/ui/Badge";
 import { Reveal } from "../../components/ui/Reveal";
 import { Accordion } from "../../components/ui/Accordion";
+import { HeroCarouselSlot, type HeroSlide } from "../../components/ui/HeroCarouselSlot";
 import { rooms } from "../../data/rooms";
-import { brandImagery, roomImagery } from "../../data/imagery";
+import { brandImagery, roomImagery, roomVideos } from "../../data/imagery";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -73,11 +74,17 @@ const [combineA, combineB] = [
   rooms.find((r) => r.id === "room-5")!,
 ];
 
+/** One slide per room, video where available — cycled across the three hero panels. */
+const heroSlides: HeroSlide[] = rooms.map((room) => {
+  const video = roomVideos.perRoom[room.id];
+  return video ? { type: "video", src: video } : { type: "image", src: roomImagery[room.id] };
+});
+
 export function Home() {
   const collageRef = useRef<HTMLDivElement>(null);
-  const bigImgRef = useRef<HTMLImageElement>(null);
-  const smallImg1Ref = useRef<HTMLImageElement>(null);
-  const smallImg2Ref = useRef<HTMLImageElement>(null);
+  const bigImgRef = useRef<HTMLDivElement>(null);
+  const smallImg1Ref = useRef<HTMLDivElement>(null);
+  const smallImg2Ref = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
@@ -99,28 +106,19 @@ export function Home() {
             className="grid grid-cols-6 grid-rows-2 gap-3 sm:gap-4 h-[280px] sm:h-[380px] lg:h-[460px]"
           >
             <div className="col-span-4 row-span-2 relative overflow-hidden rounded-[28px]">
-              <img
-                ref={bigImgRef}
-                src={brandImagery.hero}
-                alt=""
-                className="absolute inset-x-0 -top-[15%] w-full h-[130%] object-cover"
-              />
+              <div ref={bigImgRef} className="absolute inset-x-0 -top-[15%] w-full h-[130%]">
+                <HeroCarouselSlot slides={heroSlides} startIndex={0} />
+              </div>
             </div>
             <div className="col-span-2 row-span-1 relative overflow-hidden rounded-[24px]">
-              <img
-                ref={smallImg1Ref}
-                src={roomImagery["room-3"]}
-                alt=""
-                className="absolute inset-x-0 -top-[15%] w-full h-[130%] object-cover"
-              />
+              <div ref={smallImg1Ref} className="absolute inset-x-0 -top-[15%] w-full h-[130%]">
+                <HeroCarouselSlot slides={heroSlides} startIndex={2} />
+              </div>
             </div>
             <div className="col-span-2 row-span-1 relative overflow-hidden rounded-[24px]">
-              <img
-                ref={smallImg2Ref}
-                src={roomImagery["room-6"]}
-                alt=""
-                className="absolute inset-x-0 -top-[15%] w-full h-[130%] object-cover"
-              />
+              <div ref={smallImg2Ref} className="absolute inset-x-0 -top-[15%] w-full h-[130%]">
+                <HeroCarouselSlot slides={heroSlides} startIndex={4} />
+              </div>
             </div>
           </div>
 
