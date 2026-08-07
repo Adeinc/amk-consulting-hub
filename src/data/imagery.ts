@@ -24,20 +24,24 @@ export const roomImagery: Record<string, string> = {
 };
 
 /**
- * Real location/room video URLs — pending. Freda is sourcing a videographer; nothing here
- * should be fabricated in the meantime. Both the "All rooms" header and each room's detail
- * page are built to use a video the moment a URL is added here, falling back to the current
- * stock photo until then. Fill in and the fallback disappears automatically — no other code
- * changes needed.
+ * Room header videos — stock placeholders (free-license Pexels video, pexels.com host,
+ * re-encoded locally for web size), standing in until Freda's videographer delivers real
+ * footage. NOT footage of AMK's actual rooms.
+ *
+ * These were hand-checked frame-by-frame before use: an earlier batch of "generic clinic
+ * interior" search results turned out to be real, identifiable footage of an actual
+ * (unrelated) clinic with its own signage and staff visible — those were discarded rather
+ * than shipped. What's here is verified clean: no people, no readable branding/signage.
+ * Swap the URLs for real videos the moment they exist — no other code changes needed.
  */
 export const roomVideos: { allRoomsHeader?: string; perRoom: Record<string, string | undefined> } = {
-  allRoomsHeader: undefined,
+  allRoomsHeader: "/videos/room-meeting.mp4",
   perRoom: {
-    "room-1": undefined,
-    "room-2": undefined,
-    "room-3": undefined,
-    "room-4": undefined,
-    "room-5": undefined,
-    "room-6": undefined,
+    "room-1": "/videos/room-meeting.mp4",
+    "room-2": "/videos/room-meeting.mp4",
+    "room-3": "/videos/room-meeting.mp4",
+    "room-4": "/videos/room-conference.mp4",
+    "room-5": "/videos/room-conference.mp4",
+    "room-6": "/videos/room-rowan.mp4",
   },
 };
