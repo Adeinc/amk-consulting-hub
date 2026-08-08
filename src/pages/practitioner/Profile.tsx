@@ -6,6 +6,8 @@ import { Button } from "../../components/ui/Button";
 import { useToast } from "../../components/ui/Toast";
 import { QrCode } from "../../components/booking/QrCode";
 import { BookingDetailModal } from "../../components/booking/BookingDetailModal";
+import { useAuth } from "../../hooks/useAuth";
+import { supabase } from "../../lib/supabase";
 import { getMockBookings, bookingReferenceQrValue, type MockBooking } from "../../lib/mockBookings";
 import { sessionLabels } from "../../data/rooms";
 
@@ -38,10 +40,10 @@ function Toggle({ checked, onChange, label, detail }: { checked: boolean; onChan
 
 export function Profile() {
   const showToast = useToast();
-  const [name, setName] = useState("Alex Practitioner");
-  const [email, setEmail] = useState("alex@example.com");
+  const { user, profile, refreshProfile } = useAuth();
+  const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [credentialsConfirmed, setCredentialsConfirmed] = useState(true);
+  const [credentialsConfirmed, setCredentialsConfirmed] = useState(false);
   const [notifyConfirmations, setNotifyConfirmations] = useState(true);
   const [notifyReminders, setNotifyReminders] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -52,25 +54,52 @@ export function Profile() {
     setBookings(getMockBookings());
   }, []);
 
-  function handleSave() {
+  useEffect(() => {
+    if (profile) {
+      setName(profile.full_name);
+      setPhone(profile.phone ?? "");
+    }
+  }, [profile]);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("practitioners")
+      .select("credentials_attested")
+      .eq("id", user.id)
+      .single()
+      .then(({ data }) => {
+        if (data) setCredentialsConfirmed(data.credentials_attested);
+      });
+  }, [user]);
+
+  async function handleSave() {
+    if (!user) return;
     setSaving(true);
-    // TODO(Milestone 3/7): persist to Supabase; notification preferences drive Resend sends.
-    window.setTimeout(() => {
-      setSaving(false);
-      showToast("Profile saved", "confirm");
-    }, 500);
+
+    const [{ error: profileError }, { error: practitionerError }] = await Promise.all([
+      supabase.from("profiles").update({ full_name: name, phone: phone || null }).eq("id", user.id),
+      supabase.from("practitioners").update({ credentials_attested: credentialsConfirmed }).eq("id", user.id),
+    ]);
+
+    setSaving(false);
+    if (profileError || practitionerError) {
+      showToast(profileError?.message ?? practitionerError?.message ?? "Couldn't save changes", "alert");
+      return;
+    }
+    await refreshProfile();
+    // TODO(Milestone 7): persist notification preferences once a column exists to drive Resend sends.
+    showToast("Profile saved", "confirm");
   }
 
   return (
     <DashboardShell role="Practitioner" navItems={navItems} title="Profile">
-      <p className="text-sm text-navy/55 mb-6">Sample data shown — connects to your real account at Milestone 3.</p>
-
       <div className="grid lg:grid-cols-2 gap-6">
         <Card>
           <p className="font-display text-lg font-bold mb-4">Account details</p>
           <div className="flex flex-col gap-4">
             <Input label="Full name" value={name} onChange={(e) => setName(e.target.value)} />
-            <Input label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input label="Email" type="email" value={user?.email ?? ""} disabled />
             <Input label="Phone (optional)" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
           </div>
 

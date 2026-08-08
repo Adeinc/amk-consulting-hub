@@ -3,20 +3,25 @@ import { Link } from "react-router-dom";
 import { AuthShell } from "../../components/layout/AuthShell";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
+import { supabase } from "../../lib/supabase";
 
 export function ForgotPassword() {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [email, setEmail] = useState("");
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setLoading(true);
-    // TODO(Milestone 3): wire to supabase.auth.resetPasswordForEmail, sent via Resend
-    window.setTimeout(() => {
-      setLoading(false);
-      setSent(true);
-    }, 600);
+
+    // Always show the "check your email" state regardless of outcome — never reveal
+    // whether an account exists for a given address (Supabase's error here would too).
+    await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+
+    setLoading(false);
+    setSent(true);
   }
 
   if (sent) {

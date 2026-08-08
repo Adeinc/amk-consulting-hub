@@ -1,5 +1,7 @@
 import { type ReactNode, useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { flushSync } from "react-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 
 interface NavItem {
   to: string;
@@ -18,6 +20,18 @@ export function DashboardShell({
   children: ReactNode;
 }) {
   const [open, setOpen] = useState(false);
+  const { profile, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleSignOut() {
+    // Force the navigation to commit synchronously before clearing the session —
+    // otherwise ProtectedRoute reacts to session becoming null while still mounted
+    // and its own redirect to /sign-in wins the race.
+    flushSync(() => {
+      navigate("/", { replace: true });
+    });
+    await signOut();
+  }
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-soft">
@@ -58,10 +72,16 @@ export function DashboardShell({
           ))}
         </nav>
 
-        <div className="mt-auto px-6 py-5 border-t border-white/10">
+        <div className="mt-auto px-6 py-5 border-t border-white/10 flex flex-col gap-2">
           <Link to="/" className="text-sm font-medium text-white/55 hover:text-white">
             &larr; Back to site
           </Link>
+          <button
+            onClick={handleSignOut}
+            className="text-sm font-medium text-white/55 hover:text-white text-left cursor-pointer"
+          >
+            Sign out
+          </button>
         </div>
       </aside>
 
@@ -79,8 +99,11 @@ export function DashboardShell({
             </button>
             <h1 className="font-display text-xl font-extrabold">{title}</h1>
           </div>
-          <div className="w-9 h-9 rounded-full gradient-brand text-white flex items-center justify-center text-sm font-bold shadow-[var(--shadow-glow)]">
-            {role === "Admin" ? "A" : "P"}
+          <div
+            className="w-9 h-9 rounded-full gradient-brand text-white flex items-center justify-center text-sm font-bold shadow-[var(--shadow-glow)]"
+            title={profile?.full_name}
+          >
+            {profile?.full_name?.[0]?.toUpperCase() ?? (role === "Admin" ? "A" : "P")}
           </div>
         </header>
 
