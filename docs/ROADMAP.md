@@ -28,9 +28,9 @@ This roadmap sequences work so the client sees a working, deployable system earl
 - [x] Base layout: Header, Footer, responsive nav
 - [x] Supabase project provisioned (`fzxhkljocnxwowlsyhnf`, eu-west-3) — one project so far, not yet
       split into separate dev/prod projects (see README's environments note); schema migrations
-      applied (`0001_init.sql`, `0002_add_reminder_tracking.sql`); `send-booking-confirmation` and
-      `send-booking-reminder` Edge Functions deployed. Auth not yet wired into the UI (still
-      Milestone 3 work) — the project exists and is reachable, the app doesn't call it yet.
+      applied (`0001_init.sql`, `0002_add_reminder_tracking.sql`, `0003_auto_create_profile.sql`);
+      `send-booking-confirmation` and `send-booking-reminder` Edge Functions deployed. Auth is now
+      wired into the UI (Milestone 3) — see below.
 - [x] Repository on GitHub (`github.com/Adeinc/amk-consulting-hub`, public — Netlify's
       private-repo plan only trusts pushes from its one connected contributor account, which
       blocked builds pushed from a collaborator; made public to unblock CI rather than upgrade
@@ -49,9 +49,15 @@ This roadmap sequences work so the client sees a working, deployable system earl
 ## Milestone 3 — Authentication & Practitioner Accounts
 
 - [x] Sign in / sign up UI built
-- [ ] Wire to Supabase Auth (register / login / password reset)
-- [ ] Email verification flow (Resend)
-- [x] Practitioner dashboard shell (mock data)
+- [x] Wired to Supabase Auth (register / login / password reset, route protection via
+      `ProtectedRoute`, real profile read/write on the Profile page). Verified end-to-end in
+      browser: sign-up, unconfirmed-account block, confirmation, sign-in, profile save, sign-out,
+      and route-protection redirect all tested against the live project.
+- [ ] Confirmation/reset emails currently use Supabase's own default templates, not the
+      AMK-branded Resend flow — that swap is blocked on the same Edge Function secrets issue
+      noted in `EMAIL_SETUP.md` (needs Freda/an Owner-role account to set `RESEND_API_KEY`).
+- [x] Practitioner dashboard shell — bookings list still shows sample/mock data (real booking
+      writes are Milestone 4)
 
 ## Milestone 4 — Booking Engine (core value)
 
