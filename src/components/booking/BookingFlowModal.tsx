@@ -3,7 +3,7 @@ import { Modal } from "../ui/Modal";
 import { Button } from "../ui/Button";
 import { Select } from "../ui/Select";
 import { QrCode } from "./QrCode";
-import { createMockBooking, bookingReferenceQrValue, type MockBooking } from "../../lib/mockBookings";
+import { createBooking, bookingGroupQrValue, type BookingGroup } from "../../lib/bookings";
 import { sendBookingConfirmationEmail } from "../../lib/resend";
 import { sessionLabels } from "../../data/rooms";
 import type { Room, SessionType } from "../../types";
@@ -36,7 +36,8 @@ export function BookingFlowModal({ room, open, onClose }: { room: Room; open: bo
   const [days, setDays] = useState(1);
   const [session, setSession] = useState<SessionType>("am");
   const [paying, setPaying] = useState(false);
-  const [booking, setBooking] = useState<MockBooking | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [booking, setBooking] = useState<BookingGroup | null>(null);
 
   const rate = rateFor(room, session);
   const total = rate * days;
@@ -47,6 +48,7 @@ export function BookingFlowModal({ room, open, onClose }: { room: Room; open: bo
     setDays(1);
     setSession("am");
     setPaying(false);
+    setError(null);
     setBooking(null);
   }
 
@@ -55,16 +57,21 @@ export function BookingFlowModal({ room, open, onClose }: { room: Room; open: bo
     window.setTimeout(reset, 250);
   }
 
-  function handlePay() {
+  async function handlePay() {
     setPaying(true);
+    setError(null);
     // TODO(Milestone 5): replace with real Stripe payment — this does not charge a card.
-    window.setTimeout(() => {
-      const created = createMockBooking({ room, startDate, days, session, total });
-      setBooking(created);
-      setPaying(false);
-      setStep("confirmation");
-      // No-ops until Milestone 4 (real bookings table) — see src/lib/resend.ts.
-      void sendBookingConfirmationEmail(created.id);
+    window.setTimeout(async () => {
+      try {
+        const created = await createBooking({ roomSlug: room.slug, roomName: room.name, startDate, days, session });
+        setBooking(created);
+        setStep("confirmation");
+        void sendBookingConfirmationEmail(created.primaryBookingId);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Something went wrong — please try again.");
+      } finally {
+        setPaying(false);
+      }
     }, 900);
   }
 
@@ -189,6 +196,7 @@ export function BookingFlowModal({ room, open, onClose }: { room: Room; open: bo
             <span className="text-sm font-semibold text-navy/70">Total due today</span>
             <span className="text-xl font-extrabold text-teal-deep">&pound;{total}</span>
           </div>
+          {error && <p className="text-sm text-alert font-semibold">{error}</p>}
           <div className="flex gap-3">
             <Button variant="secondary" className="flex-1" disabled={paying} onClick={() => setStep("summary")}>
               Back
@@ -224,7 +232,7 @@ export function BookingFlowModal({ room, open, onClose }: { room: Room; open: bo
             </p>
           </div>
 
-          <QrCode value={bookingReferenceQrValue(booking)} />
+          <QrCode value={bookingGroupQrValue(booking)} />
 
           <div className="bg-soft rounded-2xl px-5 py-3 font-mono-tight text-lg font-bold text-navy tracking-wide">
             {booking.code}

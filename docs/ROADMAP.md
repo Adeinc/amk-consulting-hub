@@ -61,21 +61,35 @@ This roadmap sequences work so the client sees a working, deployable system earl
 
 ## Milestone 4 — Booking Engine (core value)
 
-- [ ] Availability engine: AM / PM / full-day session logic across six rooms
-- [ ] Blocked dates support
-- [ ] Booking creation flow with conflict prevention (no double-booking) — schema-level rule
-      already designed in `0001_init.sql`
-- [ ] Pending vs confirmed booking states — **auto-confirm on payment is now the locked
-      default** (see Section 4 below), not admin-approved
-- [ ] Multi-day bookings (a practitioner books N consecutive days in one go, priced as
-      days × session rate) — the frontend flow, summary, and pricing are prototyped
-      (`BookingFlowModal.tsx`) against mock data; `0001_init.sql`'s `bookings` table models
-      one date per row, so this needs real schema design (a date range vs. one row per day)
-      once the booking engine is actually built
-- [ ] Booking access codes + QR — prototyped end-to-end on mock data (booking confirmation,
-      profile/dashboard display, and an "extend" flow that issues a fresh code). Needs Freda's
-      input on the actual door-access system/vendor before this becomes real — the UI doesn't
-      assume or claim to control any physical hardware
+- [x] Rooms table seeded (`0004_booking_group_and_seed_rooms.sql`) — mirrors `data/rooms.ts`'s
+      six rooms so bookings have a real `room_id` to reference. `data/rooms.ts` still drives all
+      display content (still explicitly client-unconfirmed placeholder pricing/copy); keeping the
+      two in sync when pricing changes is a manual step until rooms get an admin-editable home
+      (Milestone 6).
+- [x] Booking creation flow with conflict prevention (no double-booking) — real writes to the
+      `bookings` table, using the unique-index + trigger rules already designed in
+      `0001_init.sql`. Verified in browser: a real conflicting booking attempt is blocked with a
+      friendly error, not a crash.
+- [x] Auto-confirm on payment — bookings write as `status: 'confirmed'` the moment the (still
+      simulated) payment step completes, matching the locked business rule. Payment itself is
+      still simulated pending Stripe (Milestone 5) — **this means real rooms can be booked for
+      free on the live site until Stripe ships**, a deliberate tradeoff to keep the booking UX
+      matching its final behaviour early.
+- [x] Multi-day bookings — resolved via a `booking_group_id` column (`0004_...sql`): an N-day
+      booking is N rows sharing one group id, so the existing per-day conflict rules cover
+      multi-day bookings with no changes to that logic. `src/lib/bookings.ts` presents this as a
+      single `BookingGroup` to the UI.
+- [x] Price integrity — a new `enforce_booking_price` trigger recomputes `bookings.price`
+      server-side from the room's real rate on every insert, so a tampered client insert can't
+      set an arbitrary price. Verified: client sends `price: 0`, database stores the real rate.
+- [x] Booking access codes + QR — real now (derived from the booking's real database id, format
+      matches what `send-booking-confirmation`'s email already computes), extending a booking
+      keeps the same code. Still needs Freda's input on the actual door-access system/vendor
+      before it drives real hardware — the UI doesn't assume or claim to control anything
+      physical.
+- [ ] Availability engine (a real per-room/date/session calendar view) and blocked dates support
+      — not yet built; `AvailabilityBoard.tsx` on the room page remains an explicitly-labelled
+      illustrative "sample pattern", not wired to real data
 
 ## Milestone 5 — Payments
 

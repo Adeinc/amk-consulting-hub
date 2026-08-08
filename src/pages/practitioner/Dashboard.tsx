@@ -6,7 +6,7 @@ import { Button } from "../../components/ui/Button";
 import { BookingDetailModal } from "../../components/booking/BookingDetailModal";
 import { Link } from "react-router-dom";
 import { rooms, sessionLabels } from "../../data/rooms";
-import { getMockBookings, type MockBooking } from "../../lib/mockBookings";
+import { getMyBookingGroups, isBookingGroupPast, type BookingGroup } from "../../lib/bookings";
 import type { Room, SessionType, BookingStatus } from "../../types";
 
 const navItems = [
@@ -31,10 +31,11 @@ const illustrativePast: IllustrativeBooking[] = [
   { id: "b3", room: rooms[2], date: "2026-07-10", session: "pm", status: "completed" },
 ];
 
-function toMockShape(b: IllustrativeBooking): MockBooking {
+function toBookingGroupShape(b: IllustrativeBooking): BookingGroup {
   const rate = b.session === "am" ? b.room.priceAm : b.session === "pm" ? b.room.pricePm : b.room.priceFullDay;
   return {
-    id: b.id,
+    groupId: b.id,
+    primaryBookingId: b.id,
     code: `AMK-SAMPLE${b.id.slice(-2).toUpperCase()}`,
     roomId: b.room.id,
     roomName: b.room.name,
@@ -42,22 +43,26 @@ function toMockShape(b: IllustrativeBooking): MockBooking {
     days: 1,
     session: b.session,
     total: rate,
+    status: b.status,
     createdAt: b.date,
   };
 }
 
 export function PractitionerDashboard() {
-  const [realBookings, setRealBookings] = useState<MockBooking[]>([]);
-  const [viewing, setViewing] = useState<MockBooking | null>(null);
+  const [realBookings, setRealBookings] = useState<BookingGroup[]>([]);
+  const [viewing, setViewing] = useState<BookingGroup | null>(null);
 
   useEffect(() => {
-    setRealBookings(getMockBookings());
+    getMyBookingGroups().then(setRealBookings);
   }, []);
 
-  const upcoming: MockBooking[] = [...realBookings, ...illustrativeUpcoming.map(toMockShape)];
-  const past: MockBooking[] = illustrativePast.map(toMockShape);
+  const realUpcoming = realBookings.filter((b) => !isBookingGroupPast(b));
+  const realPast = realBookings.filter(isBookingGroupPast);
 
-  function BookingRow({ booking, isReal }: { booking: MockBooking; isReal: boolean }) {
+  const upcoming: BookingGroup[] = [...realUpcoming, ...illustrativeUpcoming.map(toBookingGroupShape)];
+  const past: BookingGroup[] = [...realPast, ...illustrativePast.map(toBookingGroupShape)];
+
+  function BookingRow({ booking, isReal }: { booking: BookingGroup; isReal: boolean }) {
     return (
       <div className="flex items-center justify-between py-4 border-b border-border last:border-0 gap-3">
         <div className="min-w-0">
@@ -99,7 +104,7 @@ export function PractitionerDashboard() {
               content: (
                 <div>
                   {upcoming.map((b) => (
-                    <BookingRow key={b.id} booking={b} isReal={realBookings.some((r) => r.id === b.id)} />
+                    <BookingRow key={b.groupId} booking={b} isReal={realBookings.some((r) => r.groupId === b.groupId)} />
                   ))}
                 </div>
               ),
@@ -107,7 +112,13 @@ export function PractitionerDashboard() {
             {
               id: "past",
               label: `History (${past.length})`,
-              content: <div>{past.map((b) => <BookingRow key={b.id} booking={b} isReal={false} />)}</div>,
+              content: (
+                <div>
+                  {past.map((b) => (
+                    <BookingRow key={b.groupId} booking={b} isReal={realBookings.some((r) => r.groupId === b.groupId)} />
+                  ))}
+                </div>
+              ),
             },
           ]}
         />
@@ -116,11 +127,11 @@ export function PractitionerDashboard() {
       {viewing && (
         <BookingDetailModal
           booking={viewing}
-          extendable={realBookings.some((r) => r.id === viewing.id)}
+          extendable={realBookings.some((r) => r.groupId === viewing.groupId) && !isBookingGroupPast(viewing)}
           open={!!viewing}
           onClose={() => setViewing(null)}
           onExtended={(updated) => {
-            setRealBookings((prev) => prev.map((b) => (b.id === updated.id ? updated : b)));
+            setRealBookings((prev) => prev.map((b) => (b.groupId === updated.groupId ? updated : b)));
             setViewing(updated);
           }}
         />

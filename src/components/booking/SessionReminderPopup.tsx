@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "../ui/Button";
 import { BookingDetailModal } from "./BookingDetailModal";
-import { getMockBookings, type MockBooking } from "../../lib/mockBookings";
+import { getMyBookingGroups, type BookingGroup } from "../../lib/bookings";
 
 /** Session time windows, matching AvailabilityBoard's labels. */
 const sessionWindows: Record<string, { start: number; end: number; label: string }> = {
@@ -15,7 +15,7 @@ function todayIso(): string {
   return new Date().toISOString().slice(0, 10);
 }
 
-function findActiveBooking(bookings: MockBooking[]): MockBooking | null {
+function findActiveBooking(bookings: BookingGroup[]): BookingGroup | null {
   const today = todayIso();
   const hour = new Date().getHours() + new Date().getMinutes() / 60;
 
@@ -35,17 +35,16 @@ function findActiveBooking(bookings: MockBooking[]): MockBooking | null {
 /**
  * A live "you're on site right now" reminder — like Ringo's parking-time nudge — that
  * surfaces on any page while today falls inside one of the practitioner's booked sessions.
- * Client-side only (mock bookings via localStorage); real version needs Milestone 4's
- * bookings table to know true session state server-side.
+ * Reads real bookings; naturally no-ops when signed out (getMyBookingGroups returns []).
  */
 export function SessionReminderPopup() {
-  const [booking, setBooking] = useState<MockBooking | null>(null);
+  const [booking, setBooking] = useState<BookingGroup | null>(null);
   const [dismissed, setDismissed] = useState(false);
   const [extending, setExtending] = useState(false);
 
   useEffect(() => {
     function check() {
-      setBooking(findActiveBooking(getMockBookings()));
+      getMyBookingGroups().then((bookings) => setBooking(findActiveBooking(bookings)));
     }
     check();
     const id = window.setInterval(check, 60_000);

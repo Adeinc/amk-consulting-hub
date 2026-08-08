@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { PageShell } from "../../components/layout/PageShell";
 import { Badge, Stamp } from "../../components/ui/Badge";
 import { Button } from "../../components/ui/Button";
@@ -8,12 +8,23 @@ import { AvailabilityBoard } from "../../components/booking/AvailabilityBoard";
 import { BookingFlowModal } from "../../components/booking/BookingFlowModal";
 import { rooms, sessionLabels, professionalTips } from "../../data/rooms";
 import { roomImagery, roomVideos } from "../../data/imagery";
+import { useAuth } from "../../hooks/useAuth";
 
 export function RoomDetail() {
   const { slug } = useParams();
+  const { session } = useAuth();
+  const navigate = useNavigate();
   const room = rooms.find((r) => r.slug === slug);
   const partner = room?.combinesWithRoomId ? rooms.find((r) => r.id === room.combinesWithRoomId) : undefined;
   const [bookingOpen, setBookingOpen] = useState(false);
+
+  function handleBookClick() {
+    if (!session) {
+      navigate(`/sign-in?next=${encodeURIComponent(`/rooms/${slug}`)}`);
+      return;
+    }
+    setBookingOpen(true);
+  }
 
   if (!room) {
     return (
@@ -112,7 +123,7 @@ export function RoomDetail() {
                   </div>
                 ))}
               </div>
-              <Button className="w-full" size="lg" onClick={() => setBookingOpen(true)}>
+              <Button className="w-full" size="lg" onClick={handleBookClick}>
                 Book this room
               </Button>
               <p className="text-xs text-navy/45 text-center mt-3">

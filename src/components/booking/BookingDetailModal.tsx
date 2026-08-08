@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Modal } from "../ui/Modal";
 import { Button } from "../ui/Button";
 import { QrCode } from "./QrCode";
-import { extendMockBooking, bookingReferenceQrValue, type MockBooking } from "../../lib/mockBookings";
+import { extendBooking, bookingGroupQrValue, type BookingGroup } from "../../lib/bookings";
 import { sendBookingConfirmationEmail } from "../../lib/resend";
 import { sessionLabels } from "../../data/rooms";
 
@@ -23,15 +23,16 @@ export function BookingDetailModal({
   onClose,
   onExtended,
 }: {
-  booking: MockBooking;
+  booking: BookingGroup;
   extendable: boolean;
   open: boolean;
   onClose: () => void;
-  onExtended?: (updated: MockBooking) => void;
+  onExtended?: (updated: BookingGroup) => void;
 }) {
   const [mode, setMode] = useState<Mode>("view");
   const [extraDays, setExtraDays] = useState(1);
   const [paying, setPaying] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [current, setCurrent] = useState(booking);
 
   const rate = Math.round(current.total / current.days);
@@ -45,19 +46,22 @@ export function BookingDetailModal({
     }, 250);
   }
 
-  function handlePayExtension() {
+  async function handlePayExtension() {
     setPaying(true);
+    setError(null);
     // TODO(Milestone 5): real Stripe charge for the extension amount.
-    window.setTimeout(() => {
-      const updated = extendMockBooking(current.id, extraDays, extraCost);
-      if (updated) {
+    window.setTimeout(async () => {
+      try {
+        const updated = await extendBooking(current, extraDays);
         setCurrent(updated);
         onExtended?.(updated);
-        // No-ops until Milestone 4 (real bookings table) — see src/lib/resend.ts.
-        void sendBookingConfirmationEmail(updated.id);
+        void sendBookingConfirmationEmail(updated.primaryBookingId);
+        setMode("extend-done");
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Something went wrong — please try again.");
+      } finally {
+        setPaying(false);
       }
-      setPaying(false);
-      setMode("extend-done");
     }, 900);
   }
 
@@ -76,7 +80,7 @@ export function BookingDetailModal({
             {current.roomName} &middot; {formatDateRange(current.startDate, current.days)} &middot;{" "}
             {sessionLabels[current.session]}
           </p>
-          <QrCode value={bookingReferenceQrValue(current)} />
+          <QrCode value={bookingGroupQrValue(current)} />
           <div className="bg-soft rounded-2xl px-5 py-3 font-mono-tight text-lg font-bold text-navy tracking-wide">
             {current.code}
           </div>
@@ -144,6 +148,7 @@ export function BookingDetailModal({
             <span className="text-sm font-semibold text-navy/70">Extension total</span>
             <span className="text-xl font-extrabold text-teal-deep">&pound;{extraCost}</span>
           </div>
+          {error && <p className="text-sm text-alert font-semibold">{error}</p>}
           <div className="flex gap-3">
             <Button variant="secondary" className="flex-1" disabled={paying} onClick={() => setMode("extend-select")}>
               Back
@@ -158,14 +163,14 @@ export function BookingDetailModal({
       {mode === "extend-done" && (
         <div className="flex flex-col items-center text-center gap-4">
           <p className="text-sm text-navy/70 font-semibold">
-            Extended to {formatDateRange(current.startDate, current.days)} — a fresh access code has been issued.
+            Extended to {formatDateRange(current.startDate, current.days)} — same code, covers the extra days too.
           </p>
-          <QrCode value={bookingReferenceQrValue(current)} />
+          <QrCode value={bookingGroupQrValue(current)} />
           <div className="bg-soft rounded-2xl px-5 py-3 font-mono-tight text-lg font-bold text-navy tracking-wide">
             {current.code}
           </div>
           <p className="text-xs text-navy/45 leading-relaxed max-w-xs">
-            Your previous code no longer works — use this one from now on.
+            Show this code or QR at reception, or use it at the door on arrival.
           </p>
           <Button className="w-full" onClick={handleClose}>
             Done

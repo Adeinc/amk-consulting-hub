@@ -8,7 +8,7 @@ import { QrCode } from "../../components/booking/QrCode";
 import { BookingDetailModal } from "../../components/booking/BookingDetailModal";
 import { useAuth } from "../../hooks/useAuth";
 import { supabase } from "../../lib/supabase";
-import { getMockBookings, bookingReferenceQrValue, type MockBooking } from "../../lib/mockBookings";
+import { getMyBookingGroups, bookingGroupQrValue, isBookingGroupPast, type BookingGroup } from "../../lib/bookings";
 import { sessionLabels } from "../../data/rooms";
 
 const navItems = [
@@ -47,11 +47,11 @@ export function Profile() {
   const [notifyConfirmations, setNotifyConfirmations] = useState(true);
   const [notifyReminders, setNotifyReminders] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [bookings, setBookings] = useState<MockBooking[]>([]);
-  const [viewing, setViewing] = useState<MockBooking | null>(null);
+  const [bookings, setBookings] = useState<BookingGroup[]>([]);
+  const [viewing, setViewing] = useState<BookingGroup | null>(null);
 
   useEffect(() => {
-    setBookings(getMockBookings());
+    getMyBookingGroups().then(setBookings);
   }, []);
 
   useEffect(() => {
@@ -147,8 +147,8 @@ export function Profile() {
           ) : (
             <div className="grid sm:grid-cols-2 gap-4">
               {bookings.map((b) => (
-                <div key={b.id} className="flex items-center gap-4 bg-soft rounded-2xl p-4">
-                  <QrCode value={bookingReferenceQrValue(b)} size={56} />
+                <div key={b.groupId} className="flex items-center gap-4 bg-soft rounded-2xl p-4">
+                  <QrCode value={bookingGroupQrValue(b)} size={56} />
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold text-navy text-sm truncate">{b.roomName}</p>
                     <p className="text-xs text-navy/55 mb-1">
@@ -170,11 +170,11 @@ export function Profile() {
       {viewing && (
         <BookingDetailModal
           booking={viewing}
-          extendable
+          extendable={!isBookingGroupPast(viewing)}
           open={!!viewing}
           onClose={() => setViewing(null)}
           onExtended={(updated) => {
-            setBookings((prev) => prev.map((b) => (b.id === updated.id ? updated : b)));
+            setBookings((prev) => prev.map((b) => (b.groupId === updated.groupId ? updated : b)));
             setViewing(updated);
           }}
         />
