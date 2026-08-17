@@ -24,9 +24,10 @@ export function Footer() {
         <div>
           <p className="text-sm font-bold uppercase tracking-wide text-white/50 mb-3">Practice</p>
           <ul className="flex flex-col gap-2 text-sm text-white/75">
-            <li><a href="#" className="hover:text-white">Terms</a></li>
-            <li><a href="#" className="hover:text-white">Privacy</a></li>
-            <li><a href="mailto:info@amkconsultinghub.co.uk" className="hover:text-white">Contact</a></li>
+            <li><Link to="/faq" className="hover:text-white">FAQ</Link></li>
+            <li><Link to="/contact" className="hover:text-white">Contact &amp; directions</Link></li>
+            <li><Link to="/terms" className="hover:text-white">Terms</Link></li>
+            <li><Link to="/privacy" className="hover:text-white">Privacy</Link></li>
           </ul>
         </div>
 

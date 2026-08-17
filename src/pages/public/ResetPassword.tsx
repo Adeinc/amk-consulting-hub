@@ -4,6 +4,7 @@ import { AuthShell } from "../../components/layout/AuthShell";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import { supabase } from "../../lib/supabase";
+import { useSeo } from "../../hooks/useSeo";
 
 /**
  * Landed on from the link in a "forgot password" email. Supabase Auth reads the recovery
@@ -11,6 +12,13 @@ import { supabase } from "../../lib/supabase";
  * call updateUser with the new password.
  */
 export function ResetPassword() {
+  useSeo({
+    title: "Set a New Password | AMK Consulting Hub",
+    description: "Set a new password for your AMK Consulting Hub practitioner account.",
+    path: "/reset-password",
+    noindex: true,
+  });
+
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);

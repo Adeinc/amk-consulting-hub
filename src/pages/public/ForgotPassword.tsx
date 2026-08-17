@@ -4,8 +4,16 @@ import { AuthShell } from "../../components/layout/AuthShell";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import { supabase } from "../../lib/supabase";
+import { useSeo } from "../../hooks/useSeo";
 
 export function ForgotPassword() {
+  useSeo({
+    title: "Reset Your Password | AMK Consulting Hub",
+    description: "Request a password reset link for your AMK Consulting Hub practitioner account.",
+    path: "/forgot-password",
+    noindex: true,
+  });
+
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [email, setEmail] = useState("");

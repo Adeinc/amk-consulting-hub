@@ -1,0 +1,10 @@
+# Netlify applies these to every response from the published site. This file is not read by
+# the local Vite dev server — CSP/header behaviour can only be verified on an actual Netlify
+# deploy (preview or production), not localhost.
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://images.unsplash.com https://fzxhkljocnxwowlsyhnf.supabase.co; connect-src 'self' https://fzxhkljocnxwowlsyhnf.supabase.co https://api.stripe.com; frame-src https://www.google.com https://js.stripe.com; object-src 'none'; base-uri 'self'; form-action 'self'

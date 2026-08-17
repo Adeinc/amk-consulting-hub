@@ -4,8 +4,16 @@ import { AuthShell } from "../../components/layout/AuthShell";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import { supabase } from "../../lib/supabase";
+import { useSeo } from "../../hooks/useSeo";
 
 export function SignIn() {
+  useSeo({
+    title: "Sign In | AMK Consulting Hub",
+    description: "Sign in to your AMK Consulting Hub practitioner account.",
+    path: "/sign-in",
+    noindex: true,
+  });
+
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const next = params.get("next") ?? "/dashboard";

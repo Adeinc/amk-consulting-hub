@@ -4,8 +4,15 @@ import { Badge, Stamp } from "../../components/ui/Badge";
 import { Reveal } from "../../components/ui/Reveal";
 import { rooms } from "../../data/rooms";
 import { brandImagery, roomVideos } from "../../data/imagery";
+import { useSeo } from "../../hooks/useSeo";
 
 export function RoomsList() {
+  useSeo({
+    title: "All Rooms | AMK Consulting Hub",
+    description: "Six independently priced clinical and therapy rooms in Manchester, including a fully equipped dental treatment room. AM, PM or full-day sessions.",
+    path: "/rooms",
+  });
+
   return (
     <PageShell>
       <section className="relative overflow-hidden">

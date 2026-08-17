@@ -4,8 +4,16 @@ import { AuthShell } from "../../components/layout/AuthShell";
 import { Input } from "../../components/ui/Input";
 import { Button } from "../../components/ui/Button";
 import { supabase } from "../../lib/supabase";
+import { useSeo } from "../../hooks/useSeo";
 
 export function SignUp() {
+  useSeo({
+    title: "Create an Account | AMK Consulting Hub",
+    description: "Create a practitioner account to book clinical and therapy rooms at AMK Consulting Hub, Manchester.",
+    path: "/sign-up",
+    noindex: true,
+  });
+
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const next = params.get("next") ?? "/dashboard";

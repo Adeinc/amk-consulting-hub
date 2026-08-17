@@ -9,6 +9,9 @@ import { BookingFlowModal } from "../../components/booking/BookingFlowModal";
 import { rooms, sessionLabels, professionalTips } from "../../data/rooms";
 import { roomImagery, roomVideos } from "../../data/imagery";
 import { useAuth } from "../../hooks/useAuth";
+import { useSeo } from "../../hooks/useSeo";
+
+const SITE_URL = "https://amk-consulting-hub.netlify.app";
 
 export function RoomDetail() {
   const { slug } = useParams();
@@ -17,6 +20,15 @@ export function RoomDetail() {
   const room = rooms.find((r) => r.slug === slug);
   const partner = room?.combinesWithRoomId ? rooms.find((r) => r.id === room.combinesWithRoomId) : undefined;
   const [bookingOpen, setBookingOpen] = useState(false);
+
+  useSeo({
+    title: room ? `${room.name} | AMK Consulting Hub` : "Room not found | AMK Consulting Hub",
+    description: room
+      ? `${room.description} AM £${room.priceAm}, PM £${room.pricePm}, full day £${room.priceFullDay}. Book online at AMK Consulting Hub, Manchester.`
+      : "This room couldn't be found.",
+    path: `/rooms/${slug}`,
+    noindex: !room,
+  });
 
   function handleBookClick() {
     if (!session) {
@@ -45,12 +57,39 @@ export function RoomDetail() {
     { type: "full_day", price: room.priceFullDay },
   ];
 
+  const breadcrumbJsonLd = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${SITE_URL}/` },
+      { "@type": "ListItem", position: 2, name: "Rooms", item: `${SITE_URL}/rooms` },
+      { "@type": "ListItem", position: 3, name: room.name, item: `${SITE_URL}/rooms/${room.slug}` },
+    ],
+  });
+
   return (
     <PageShell>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }} />
       <section className="max-w-6xl mx-auto px-6 lg:px-10 py-10 lg:py-14">
-        <Link to="/rooms" className="text-sm font-bold text-navy/55 hover:text-navy">
-          &larr; All rooms
-        </Link>
+        <nav aria-label="Breadcrumb" className="text-sm font-bold text-navy/55">
+          <ol className="flex items-center gap-2 flex-wrap">
+            <li>
+              <Link to="/" className="hover:text-navy">
+                Home
+              </Link>
+            </li>
+            <li aria-hidden="true">&rsaquo;</li>
+            <li>
+              <Link to="/rooms" className="hover:text-navy">
+                Rooms
+              </Link>
+            </li>
+            <li aria-hidden="true">&rsaquo;</li>
+            <li aria-current="page" className="text-navy">
+              {room.name}
+            </li>
+          </ol>
+        </nav>
 
         <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-10 lg:gap-16 mt-6">
           <Reveal>

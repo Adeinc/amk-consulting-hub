@@ -13,6 +13,8 @@ import { Accordion } from "../../components/ui/Accordion";
 import { HeroCarouselSlot, type HeroSlide } from "../../components/ui/HeroCarouselSlot";
 import { rooms } from "../../data/rooms";
 import { brandImagery, roomImagery, roomVideos } from "../../data/imagery";
+import { faqs } from "../../data/faq";
+import { useSeo } from "../../hooks/useSeo";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -40,27 +42,6 @@ const steps = [
   { number: "03", title: "Show up", detail: "Your booking auto-confirms the moment payment clears, so the room is simply ready." },
 ];
 
-const faqs = [
-  {
-    question: "When does my booking get confirmed?",
-    answer:
-      "The moment your payment clears — there's no manual approval step. You'll get a confirmation by email straight away.",
-  },
-  {
-    question: "What if I need to cancel?",
-    answer: "Cancellations are accepted up to 48 hours before your session (subject to final confirmation with AMK Consulting Hub).",
-  },
-  {
-    question: "Do I need to prove my credentials?",
-    answer:
-      "You'll confirm your professional credentials and insurance with a short Yes/No declaration when you register — nothing to upload.",
-  },
-  {
-    question: "Can I book two rooms as one larger space?",
-    answer: "The Elm and Ash Rooms adjoin and can combine for bigger sessions — get in touch to arrange pairing.",
-  },
-];
-
 const nearbyHighlights = [
   { icon: "🏙️", label: "Manchester city centre", detail: "~25 minutes by road" },
   { icon: "✈️", label: "Manchester Airport", detail: "Under 10 minutes by road" },
@@ -80,7 +61,30 @@ const heroSlides: HeroSlide[] = rooms.map((room) => {
   return video ? { type: "video", src: video } : { type: "image", src: roomImagery[room.id] };
 });
 
+const organizationJsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "MedicalClinic",
+  name: "AMK Consulting Hub",
+  url: "https://amk-consulting-hub.netlify.app",
+  telephone: "+447415893038",
+  email: "info@amkconsultinghub.co.uk",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "1 Brickworks, Adlington",
+    addressLocality: "Manchester",
+    postalCode: "SK10 4NL",
+    addressCountry: "GB",
+  },
+});
+
 export function Home() {
+  useSeo({
+    title: "AMK Consulting Hub — Clinical Room Booking, Manchester",
+    description:
+      "Book AM, PM or full-day clinical and therapy rooms at AMK Consulting Hub, Manchester. Instant online booking, confirmed the moment payment clears.",
+    path: "/",
+  });
+
   const collageRef = useRef<HTMLDivElement>(null);
   const bigImgRef = useRef<HTMLDivElement>(null);
   const smallImg1Ref = useRef<HTMLDivElement>(null);
@@ -98,6 +102,7 @@ export function Home() {
 
   return (
     <PageShell>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: organizationJsonLd }} />
       {/* Hero — photo collage with parallax drift, overlapping content card. */}
       <section className="bg-soft pt-8 sm:pt-10 pb-24 sm:pb-28 lg:pb-32">
         <div className="max-w-6xl mx-auto px-6 lg:px-10">
@@ -342,7 +347,12 @@ export function Home() {
             <h2 className="font-display text-3xl font-extrabold mb-10 text-center">Common questions</h2>
           </Reveal>
           <Reveal delay={100}>
-            <Accordion items={faqs} />
+            <Accordion items={faqs.slice(0, 4)} />
+            <p className="text-center mt-6">
+              <Link to="/faq" className="text-sm font-bold text-teal-deep">
+                See all frequently asked questions &rarr;
+              </Link>
+            </p>
           </Reveal>
         </div>
       </section>
