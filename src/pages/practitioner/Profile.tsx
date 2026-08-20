@@ -48,10 +48,14 @@ export function Profile() {
   const [notifyReminders, setNotifyReminders] = useState(true);
   const [saving, setSaving] = useState(false);
   const [bookings, setBookings] = useState<BookingGroup[]>([]);
+  const [bookingsLoading, setBookingsLoading] = useState(true);
   const [viewing, setViewing] = useState<BookingGroup | null>(null);
 
   useEffect(() => {
-    getMyBookingGroups().then(setBookings);
+    getMyBookingGroups().then((data) => {
+      setBookings(data);
+      setBookingsLoading(false);
+    });
   }, []);
 
   useEffect(() => {
@@ -140,7 +144,20 @@ export function Profile() {
             Your access code and QR for each booking — also emailed to you when a booking or
             extension is confirmed.
           </p>
-          {bookings.length === 0 ? (
+          {bookingsLoading ? (
+            <div className="grid sm:grid-cols-2 gap-4" aria-hidden="true">
+              {[0, 1].map((i) => (
+                <div key={i} className="flex items-center gap-4 bg-soft rounded-2xl p-4 animate-pulse">
+                  <div className="w-14 h-14 rounded-lg bg-navy/8 shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <div className="h-4 w-28 bg-navy/8 rounded-full mb-2" />
+                    <div className="h-3 w-36 bg-navy/8 rounded-full mb-2" />
+                    <div className="h-3 w-20 bg-navy/8 rounded-full" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : bookings.length === 0 ? (
             <p className="text-sm text-navy/45 py-6 text-center">
               No bookings yet — book a room to get your first access code.
             </p>

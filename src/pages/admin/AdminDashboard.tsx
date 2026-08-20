@@ -6,19 +6,19 @@ import { rooms } from "../../data/rooms";
 const navItems = [
   { to: "/admin", label: "Overview" },
   { to: "/admin", label: "Rooms" },
-  { to: "/admin", label: "Bookings" },
-  { to: "/admin", label: "Calendar" },
-  { to: "/admin", label: "Practitioners" },
-  { to: "/admin", label: "Payments" },
-  { to: "/admin", label: "Reports" },
-  { to: "/admin", label: "Settings" },
+  { to: "/admin", label: "Bookings", disabled: true },
+  { to: "/admin", label: "Calendar", disabled: true },
+  { to: "/admin", label: "Practitioners", disabled: true },
+  { to: "/admin", label: "Payments", disabled: true },
+  { to: "/admin", label: "Reports", disabled: true },
+  { to: "/admin", label: "Settings", disabled: true },
 ];
 
 /** Mock overview stats — pre-backend scaffolding, wires to real data at Milestone 6. */
 const stats = [
-  { label: "Today's bookings", value: "5" },
-  { label: "This week's occupancy", value: "62%" },
-  { label: "Revenue this week", value: "£1,240" },
+  { label: "Today's bookings", value: "5", accent: "bg-teal" },
+  { label: "This week's occupancy", value: "62%", accent: "bg-navy" },
+  { label: "Revenue this week", value: "£1,240", accent: "bg-confirm" },
 ];
 
 export function AdminDashboard() {
@@ -28,10 +28,14 @@ export function AdminDashboard() {
 
       <div className="grid sm:grid-cols-3 gap-4 mb-8">
         {stats.map((s) => (
-          <Card key={s.label}>
-            <p className="font-mono-tight text-xs font-semibold uppercase text-navy/45 mb-2">{s.label}</p>
+          <div
+            key={s.label}
+            className="relative bg-white border border-border/70 rounded-[20px] shadow-[var(--shadow-card)] overflow-hidden p-6 pl-7"
+          >
+            <span className={`absolute left-0 top-0 bottom-0 w-1.5 ${s.accent}`} aria-hidden="true" />
+            <p className="font-mono-tight text-xs font-semibold uppercase tracking-wide text-navy/45 mb-2">{s.label}</p>
             <p className="font-mono-tight text-3xl font-bold text-navy">{s.value}</p>
-          </Card>
+          </div>
         ))}
       </div>
 

@@ -6,6 +6,8 @@ import { useAuth } from "../../hooks/useAuth";
 interface NavItem {
   to: string;
   label: string;
+  /** Nav destination isn't built yet — render as a muted, non-interactive "Soon" item rather than a dead-end link. */
+  disabled?: boolean;
 }
 
 export function DashboardShell({
@@ -56,20 +58,33 @@ export function DashboardShell({
           {role} area
         </p>
         <nav className="flex flex-col gap-1 px-3">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              onClick={() => setOpen(false)}
-              className={({ isActive }) =>
-                `px-4 py-2.5 text-sm font-semibold rounded-full transition-all ${
-                  isActive ? "bg-white text-navy shadow-lg" : "text-white/65 hover:text-white hover:bg-white/10"
-                }`
-              }
-            >
-              {item.label}
-            </NavLink>
-          ))}
+          {navItems.map((item) =>
+            item.disabled ? (
+              <span
+                key={item.label}
+                aria-disabled="true"
+                className="flex items-center justify-between px-4 py-2.5 text-sm font-semibold rounded-full text-white/30 cursor-not-allowed"
+              >
+                {item.label}
+                <span className="text-[0.65rem] font-bold uppercase tracking-wide bg-white/10 rounded-full px-2 py-0.5">
+                  Soon
+                </span>
+              </span>
+            ) : (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                onClick={() => setOpen(false)}
+                className={({ isActive }) =>
+                  `px-4 py-2.5 text-sm font-semibold rounded-full transition-all ${
+                    isActive ? "bg-white text-navy shadow-lg" : "text-white/65 hover:text-white hover:bg-white/10"
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ),
+          )}
         </nav>
 
         <div className="mt-auto px-6 py-5 border-t border-white/10 flex flex-col gap-2">

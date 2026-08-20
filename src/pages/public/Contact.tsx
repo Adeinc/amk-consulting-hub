@@ -56,7 +56,7 @@ export function Contact() {
                 href={`https://www.google.com/maps/dir/?api=1&destination=${MAPS_QUERY}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center w-full mt-6 font-semibold rounded-full px-6 py-3 text-[0.95rem] gradient-brand text-white"
+                className="shine inline-flex items-center justify-center w-full mt-6 font-semibold rounded-full px-6 py-3 text-[0.95rem] gradient-brand text-white shadow-[0_8px_20px_-6px_rgba(12,132,150,0.55)] hover:shadow-[0_12px_28px_-6px_rgba(12,132,150,0.7)] hover:-translate-y-0.5 transition-all duration-200"
               >
                 Get directions
               </a>
