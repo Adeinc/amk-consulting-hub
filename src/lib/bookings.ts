@@ -20,11 +20,11 @@ export interface BookingGroup {
   createdAt: string;
 }
 
-function formatCode(bookingId: string): string {
+export function formatCode(bookingId: string): string {
   return `AMK-${bookingId.slice(0, 8).toUpperCase()}`;
 }
 
-function addDays(iso: string, n: number): string {
+export function addDays(iso: string, n: number): string {
   const d = new Date(iso);
   d.setDate(d.getDate() + n);
   return d.toISOString().slice(0, 10);

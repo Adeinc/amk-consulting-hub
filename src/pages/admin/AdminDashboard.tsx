@@ -1,32 +1,38 @@
+import { useEffect, useState } from "react";
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { DashboardShell } from "../../components/layout/DashboardShell";
-import { Card } from "../../components/ui/Card";
-import { Badge, Stamp } from "../../components/ui/Badge";
-import { rooms } from "../../data/rooms";
-
-const navItems = [
-  { to: "/admin", label: "Overview" },
-  { to: "/admin", label: "Rooms" },
-  { to: "/admin", label: "Bookings", disabled: true },
-  { to: "/admin", label: "Calendar", disabled: true },
-  { to: "/admin", label: "Practitioners", disabled: true },
-  { to: "/admin", label: "Payments", disabled: true },
-  { to: "/admin", label: "Reports", disabled: true },
-  { to: "/admin", label: "Settings", disabled: true },
-];
-
-/** Mock overview stats — pre-backend scaffolding, wires to real data at Milestone 6. */
-const stats = [
-  { label: "Today's bookings", value: "5", accent: "bg-teal" },
-  { label: "This week's occupancy", value: "62%", accent: "bg-navy" },
-  { label: "Revenue this week", value: "£1,240", accent: "bg-confirm" },
-];
+import { getBookingCountsByRoom, getTodayBookingCount, getUpcomingWeekOccupancy, type RoomBookingCount } from "../../lib/admin";
+import { adminNavItems } from "./navItems";
 
 export function AdminDashboard() {
-  return (
-    <DashboardShell role="Admin" navItems={navItems} title="Overview">
-      <p className="text-sm text-navy/55 mb-6">Sample data shown — connects to Supabase at Milestone 6.</p>
+  const [todayCount, setTodayCount] = useState<number | null>(null);
+  const [occupancy, setOccupancy] = useState<number | null>(null);
+  const [roomCounts, setRoomCounts] = useState<RoomBookingCount[]>([]);
+  const [loading, setLoading] = useState(true);
 
-      <div className="grid sm:grid-cols-3 gap-4 mb-8">
+  useEffect(() => {
+    Promise.all([getTodayBookingCount(), getUpcomingWeekOccupancy(), getBookingCountsByRoom()]).then(
+      ([today, occ, counts]) => {
+        setTodayCount(today);
+        setOccupancy(occ);
+        setRoomCounts(counts);
+        setLoading(false);
+      },
+    );
+  }, []);
+
+  const stats = [
+    { label: "Today's bookings", value: todayCount, accent: "bg-teal" },
+    { label: "Next 7 days' occupancy", value: occupancy === null ? null : `${occupancy}%`, accent: "bg-navy" },
+  ];
+
+  return (
+    <DashboardShell role="Admin" navItems={adminNavItems} title="Overview">
+      <p className="text-sm text-navy/55 mb-6">
+        Real booking data. No revenue figure yet — Stripe isn't connected, so no payment has actually been collected.
+      </p>
+
+      <div className="grid sm:grid-cols-2 gap-4 mb-8">
         {stats.map((s) => (
           <div
             key={s.label}
@@ -34,30 +40,35 @@ export function AdminDashboard() {
           >
             <span className={`absolute left-0 top-0 bottom-0 w-1.5 ${s.accent}`} aria-hidden="true" />
             <p className="font-mono-tight text-xs font-semibold uppercase tracking-wide text-navy/45 mb-2">{s.label}</p>
-            <p className="font-mono-tight text-3xl font-bold text-navy">{s.value}</p>
+            <p className="font-mono-tight text-3xl font-bold text-navy">{loading || s.value === null ? "—" : s.value}</p>
           </div>
         ))}
       </div>
 
-      <Card padded={false}>
-        <div className="px-6 py-4 border-b border-border flex items-center justify-between">
-          <p className="font-display text-lg font-bold">Rooms</p>
-          <Stamp kind="sample" />
-        </div>
-        <div className="divide-y divide-border">
-          {rooms.map((room) => (
-            <div key={room.id} className="flex items-center justify-between px-6 py-3.5">
-              <div>
-                <p className="font-semibold text-navy text-sm">{room.name}</p>
-                <p className="font-mono-tight text-xs text-navy/50">
-                  AM &pound;{room.priceAm} &middot; PM &pound;{room.pricePm} &middot; Full day &pound;{room.priceFullDay}
-                </p>
-              </div>
-              <Badge tone={room.isActive ? "confirm" : "neutral"}>{room.isActive ? "Active" : "Inactive"}</Badge>
-            </div>
-          ))}
-        </div>
-      </Card>
+      <div className="bg-white border border-border/70 rounded-[20px] shadow-[var(--shadow-card)] p-6">
+        <p className="font-display text-lg font-bold mb-1">Bookings by room</p>
+        <p className="text-sm text-navy/55 mb-4">Active and pending bookings, all time.</p>
+        {loading ? (
+          <div className="h-64 rounded-2xl bg-navy/8 animate-pulse" aria-hidden="true" />
+        ) : roomCounts.length === 0 ? (
+          <p className="text-sm text-navy/45 py-10 text-center">No bookings yet.</p>
+        ) : (
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={roomCounts} margin={{ top: 4, right: 8, left: -16, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#d8e2e2" vertical={false} />
+                <XAxis dataKey="roomName" tick={{ fontSize: 12, fill: "#0c2a4e99" }} axisLine={false} tickLine={false} />
+                <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: "#0c2a4e99" }} axisLine={false} tickLine={false} />
+                <Tooltip
+                  contentStyle={{ borderRadius: 12, border: "1px solid #d8e2e2", fontSize: 13 }}
+                  cursor={{ fill: "#0c849610" }}
+                />
+                <Bar dataKey="count" name="Bookings" fill="#0c8496" radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+      </div>
     </DashboardShell>
   );
 }

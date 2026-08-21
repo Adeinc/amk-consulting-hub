@@ -28,6 +28,12 @@ const PractitionerDashboard = lazy(() =>
 );
 const Profile = lazy(() => import("./pages/practitioner/Profile").then((m) => ({ default: m.Profile })));
 const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard").then((m) => ({ default: m.AdminDashboard })));
+const RoomsAdmin = lazy(() => import("./pages/admin/RoomsAdmin").then((m) => ({ default: m.RoomsAdmin })));
+const BookingsAdmin = lazy(() => import("./pages/admin/BookingsAdmin").then((m) => ({ default: m.BookingsAdmin })));
+const PractitionersAdmin = lazy(() =>
+  import("./pages/admin/PractitionersAdmin").then((m) => ({ default: m.PractitionersAdmin })),
+);
+const SettingsAdmin = lazy(() => import("./pages/admin/SettingsAdmin").then((m) => ({ default: m.SettingsAdmin })));
 
 function App() {
   return (
@@ -70,6 +76,38 @@ function App() {
                   element={
                     <ProtectedRoute requireRole="admin">
                       <AdminDashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/rooms"
+                  element={
+                    <ProtectedRoute requireRole="admin">
+                      <RoomsAdmin />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/bookings"
+                  element={
+                    <ProtectedRoute requireRole="admin">
+                      <BookingsAdmin />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/practitioners"
+                  element={
+                    <ProtectedRoute requireRole="admin">
+                      <PractitionersAdmin />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/settings"
+                  element={
+                    <ProtectedRoute requireRole="admin">
+                      <SettingsAdmin />
                     </ProtectedRoute>
                   }
                 />
