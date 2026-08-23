@@ -74,6 +74,7 @@ export function DashboardShell({
               <NavLink
                 key={item.to}
                 to={item.to}
+                end
                 onClick={() => setOpen(false)}
                 className={({ isActive }) =>
                   `px-4 py-2.5 text-sm font-semibold rounded-full transition-all ${

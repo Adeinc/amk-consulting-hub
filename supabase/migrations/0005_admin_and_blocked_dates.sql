@@ -10,6 +10,18 @@
 --   but was never enforced — nothing stopped a booking on a date Freda blocks.
 --   Same database-trigger pattern as prevent_full_day_conflicts, for the same
 --   reason: race-safety, not just a first-check-then-insert app-side check.
+-- * prevent_role_self_escalation: found live, 23 Aug 2026, while QA-testing the
+--   admin build — profiles_update_own_or_admin (0001_init.sql) lets a user
+--   update their own row (id = auth.uid()), but the policy has no column-level
+--   restriction, so any signed-up practitioner could set their own role to
+--   'admin' with a single client-side update call. Confirmed exploitable, not
+--   theoretical. This trigger silently reverts role to its prior value on any
+--   update from a non-admin, so the existing "own row" RLS ergonomics for
+--   full_name/phone stay unchanged while role itself is admin-only.
+-- * trg_settings_updated_at: settings has an updated_at column but was missing
+--   from 0001_init.sql's list of tables wired to set_updated_at() — found
+--   live when a real settings save didn't move the timestamp. Same trigger
+--   function every other table already uses.
 -- ============================================================================
 
 alter table profiles add column email text;
@@ -49,3 +61,21 @@ $$ language plpgsql;
 create trigger trg_prevent_blocked_date_booking
   before insert on bookings
   for each row execute function prevent_blocked_date_booking();
+
+create or replace function prevent_role_self_escalation()
+returns trigger as $$
+begin
+  if new.role is distinct from old.role and not is_admin() then
+    new.role := old.role;
+  end if;
+  return new;
+end;
+$$ language plpgsql;
+
+create trigger trg_prevent_role_self_escalation
+  before update on profiles
+  for each row execute function prevent_role_self_escalation();
+
+create trigger trg_settings_updated_at
+  before update on settings
+  for each row execute function set_updated_at();
