@@ -5,7 +5,8 @@
 --   by email (names alone can collide). The client can never safely call
 --   supabase.auth.admin.* (service-role only), so the cheapest correct fix is
 --   mirroring auth.users.email onto profiles at signup time via the existing
---   handle_new_user() trigger. No backfill — no real practitioners exist yet.
+--   handle_new_user() trigger, plus a one-time backfill from auth.users for
+--   any rows that predate this migration.
 -- * prevent_blocked_date_booking: blocked_dates has existed since 0001_init.sql
 --   but was never enforced — nothing stopped a booking on a date Freda blocks.
 --   Same database-trigger pattern as prevent_full_day_conflicts, for the same
@@ -24,7 +25,17 @@
 --   function every other table already uses.
 -- ============================================================================
 
-alter table profiles add column email text;
+begin;
+
+alter table profiles add column if not exists email text;
+
+-- Backfill existing rows (any real practitioners signed up before this migration)
+-- from the authoritative source, auth.users. Only fills nulls — never overwrites.
+update public.profiles p
+set email = u.email
+from auth.users u
+where p.id = u.id
+  and p.email is null;
 
 create or replace function handle_new_user()
 returns trigger as $$
@@ -58,6 +69,7 @@ begin
 end;
 $$ language plpgsql;
 
+drop trigger if exists trg_prevent_blocked_date_booking on bookings;
 create trigger trg_prevent_blocked_date_booking
   before insert on bookings
   for each row execute function prevent_blocked_date_booking();
@@ -72,10 +84,14 @@ begin
 end;
 $$ language plpgsql;
 
+drop trigger if exists trg_prevent_role_self_escalation on profiles;
 create trigger trg_prevent_role_self_escalation
   before update on profiles
   for each row execute function prevent_role_self_escalation();
 
+drop trigger if exists trg_settings_updated_at on settings;
 create trigger trg_settings_updated_at
   before update on settings
   for each row execute function set_updated_at();
+
+commit;
