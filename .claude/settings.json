@@ -7,20 +7,33 @@
           {
             "type": "command",
             "if": "Bash(git commit *)",
-            "command": "bash /Users/ola23101/amk-consulting-hub/.claude/hooks/pre-commit-check.sh",
-            "timeout": 120,
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pre-commit-check.sh\"",
+            "timeout": 180,
             "statusMessage": "Running typecheck/build/lint before commit…"
           }
         ]
       },
       {
-        "matcher": "Write|Edit",
+        "matcher": "Read|Write|Edit|MultiEdit|NotebookEdit|Grep|Glob|Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "bash /Users/ola23101/amk-consulting-hub/.claude/hooks/block-env-writes.sh",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/protect-secrets.mjs\"",
             "timeout": 10,
-            "statusMessage": "Checking file isn't a protected .env file…"
+            "statusMessage": "Checking this doesn't touch a secrets file…"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-edit-check.mjs\" ts \"npx tsc -b\"",
+            "timeout": 180,
+            "statusMessage": "Type-checking the change…"
           }
         ]
       }
